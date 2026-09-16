@@ -2,6 +2,10 @@ import { createBrowserRouter } from 'react-router-dom'
 import PublicLayout from '../layouts/PublicLayout'
 import AdminLayout from '../layouts/AdminLayout'
 import HomePage from '../pages/public/HomePage'
+import LayananPublikPage from '../pages/public/LayananPublikPage'
+import PotensiUmkmPage from '../pages/public/PotensiUmkmPage'
+import EdukasiSampahPage from '../pages/public/EdukasiSampahPage'
+import TanyaVirtualGuidePage from '../pages/public/TanyaVirtualGuidePage'
 import DashboardPage from '../pages/admin/DashboardPage'
 import NotFoundPage from '../pages/NotFoundPage'
 
@@ -15,7 +19,22 @@ export const router = createBrowserRouter([
         index: true,
         element: <HomePage />,
       },
-      // Tambahkan rute public lainnya di sini (contoh: /chatbot, /layanan, /profil)
+      {
+        path: 'layanan-publik',
+        element: <LayananPublikPage />,
+      },
+      {
+        path: 'potensi-umkm',
+        element: <PotensiUmkmPage />,
+      },
+      {
+        path: 'edukasi-sampah',
+        element: <EdukasiSampahPage />,
+      },
+      {
+        path: 'tanya-virtual-guide',
+        element: <TanyaVirtualGuidePage />,
+      },
     ],
   },
 
@@ -32,7 +51,6 @@ export const router = createBrowserRouter([
         path: 'dashboard',
         element: <DashboardPage />,
       },
-      // Tambahkan rute admin lainnya di sini (contoh: /admin/knowledge, /admin/layanan)
     ],
   },
 

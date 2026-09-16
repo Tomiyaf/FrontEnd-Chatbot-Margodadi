@@ -1,8 +1,10 @@
 import { Link, NavLink, Outlet } from 'react-router-dom'
+import ScrollToTop from '../components/ScrollToTop'
 
 export default function AdminLayout() {
   return (
     <div className="min-h-screen flex bg-gray-100 text-gray-800">
+      <ScrollToTop />
       {/* Sidebar Placeholder */}
       <aside className="w-64 bg-slate-900 text-slate-200 flex flex-col shrink-0 shadow-lg">
         {/* Brand */}
