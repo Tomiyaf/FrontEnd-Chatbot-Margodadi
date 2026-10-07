@@ -2,16 +2,33 @@ import { useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import ScrollToTop from '../components/ScrollToTop'
 import { initialOperators } from '../data/adminMockData'
+import { useAuth } from '../context/AuthContext'
 
 export default function AdminLayout() {
-  const [currentRole, setCurrentRole] = useState('ADMIN') // 'ADMIN' | 'OPERATOR'
+  const { operator, logout } = useAuth()
+  const currentRole = operator?.role || 'ADMIN'
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
 
-  // Default active user
-  const activeOperator = currentRole === 'ADMIN' ? initialOperators[2] : initialOperators[0] // Budi (Admin) vs Siti (Operator)
+  // Authenticated operator details with fallback
+  const activeOperator = {
+    id: operator?.operator_id ? `OP-${String(operator.operator_id).padStart(2, '0')}` : 'OP-01',
+    name: operator?.name || 'Aparatur Desa',
+    email: operator?.email || 'admin@margodadi.desa.id',
+    role: operator?.role || 'ADMIN',
+    avatar:
+      operator?.avatar_url ||
+      (currentRole === 'ADMIN'
+        ? 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
+        : 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80'),
+  }
+
+  const handleLogout = async () => {
+    await logout()
+    navigate('/login')
+  }
 
   const hitlQueueCount = 3 // Dynamic mock counter
 
@@ -230,13 +247,14 @@ export default function AdminLayout() {
               <span className="material-symbols-outlined text-sm">home</span>
               <span>Web Publik</span>
             </Link>
-            <Link
-              to="/login"
-              className="flex items-center justify-center gap-1.5 py-2 px-2 text-xs font-semibold rounded-lg bg-rose-950/60 border border-rose-800/40 text-rose-300 hover:bg-rose-900/60 transition-colors"
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex items-center justify-center gap-1.5 py-2 px-2 text-xs font-semibold rounded-lg bg-rose-950/60 border border-rose-800/40 text-rose-300 hover:bg-rose-900/60 transition-colors cursor-pointer"
             >
               <span className="material-symbols-outlined text-sm">logout</span>
               <span>Keluar</span>
-            </Link>
+            </button>
           </div>
         </div>
       </aside>

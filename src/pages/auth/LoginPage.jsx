@@ -1,28 +1,42 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('budi.santoso@margodadi.desa.id')
-  const [password, setPassword] = useState('••••••••••')
+  const [username, setUsername] = useState('admin')
+  const [password, setPassword] = useState('123')
   const [role, setRole] = useState('ADMIN')
+  const [errorMessage, setErrorMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
+  const { login } = useAuth()
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
+    setErrorMessage('')
     setIsLoading(true)
-    setTimeout(() => {
-      setIsLoading(false)
+
+    try {
+      await login(username, password)
       navigate('/admin/dashboard')
-    }, 600)
+    } catch (err) {
+      setErrorMessage(
+        err.response?.data?.message || err.message || 'Gagal masuk. Periksa username dan kata sandi.'
+      )
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleDemoFill = (selectedRole) => {
     setRole(selectedRole)
+    setErrorMessage('')
     if (selectedRole === 'ADMIN') {
-      setUsername('budi.santoso@margodadi.desa.id')
+      setUsername('admin')
+      setPassword('123')
     } else {
-      setUsername('siti.aminah@margodadi.desa.id')
+      setUsername('operator')
+      setPassword('123')
     }
   }
 
@@ -48,10 +62,13 @@ export default function LoginPage() {
 
         {/* Demo Credential Quick Selector */}
         <div className="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-3.5 space-y-2">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-            <span className="material-symbols-outlined text-sm text-primary-fixed">info</span>
-            Demo Akses Cepat Skripsi
-          </span>
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+              <span className="material-symbols-outlined text-sm text-primary-fixed">info</span>
+              Akses Cepat Aparatur
+            </span>
+            <span className="text-[10px] text-slate-400">Default Password: <b>123</b></span>
+          </div>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
@@ -62,7 +79,7 @@ export default function LoginPage() {
                   : 'bg-slate-900/60 text-slate-300 border-slate-700 hover:bg-slate-700/50'
               }`}
             >
-              👑 Admin Pekon
+              👑 Admin Pekon (admin)
             </button>
             <button
               type="button"
@@ -73,17 +90,24 @@ export default function LoginPage() {
                   : 'bg-slate-900/60 text-slate-300 border-slate-700 hover:bg-slate-700/50'
               }`}
             >
-              🎧 Operator Layanan
+              🎧 Operator (operator)
             </button>
           </div>
         </div>
 
         {/* Login Card */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-5">
+          {errorMessage && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 flex items-center gap-2">
+              <span className="material-symbols-outlined text-base text-red-500">error</span>
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
-                Email / Username Aparatur
+                Username / Email Aparatur
               </label>
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg">
@@ -92,6 +116,7 @@ export default function LoginPage() {
                 <input
                   type="text"
                   required
+                  placeholder="admin atau operator"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
@@ -110,6 +135,7 @@ export default function LoginPage() {
                 <input
                   type="password"
                   required
+                  placeholder="123"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
@@ -123,7 +149,7 @@ export default function LoginPage() {
                 <span>Ingat Sesi Ini</span>
               </label>
               <span className="text-primary hover:underline font-semibold cursor-pointer">
-                Lupa Password?
+                Bantuan Login
               </span>
             </div>
 
@@ -162,3 +188,4 @@ export default function LoginPage() {
     </div>
   )
 }
+

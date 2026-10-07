@@ -19,6 +19,8 @@ import ActivityLogPage from '../pages/admin/ActivityLogPage'
 import SettingsPage from '../pages/admin/SettingsPage'
 import NotFoundPage from '../pages/NotFoundPage'
 
+import ProtectedRoute from '../components/auth/ProtectedRoute'
+
 export const router = createBrowserRouter([
   // Layer Front-Office (Masyarakat / Publik)
   {
@@ -57,12 +59,15 @@ export const router = createBrowserRouter([
   // Layer Back-Office (Admin / Operator Monitoring & HITL Layer)
   {
     path: '/admin',
-    element: <AdminLayout />,
+    element: <ProtectedRoute />,
     children: [
       {
-        index: true,
-        element: <DashboardPage />,
-      },
+        element: <AdminLayout />,
+        children: [
+          {
+            index: true,
+            element: <DashboardPage />,
+          },
       {
         path: 'dashboard',
         element: <DashboardPage />,
@@ -121,6 +126,8 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  ],
+},
 
   // Rute fallback 404
   {
