@@ -1,19 +1,47 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import DataTable from '../../components/admin/DataTable'
-import { initialActivityLogs } from '../../data/adminMockData'
+import Pagination from '../../components/admin/Pagination'
+import activityLogService from '../../services/activityLogService'
 
 export default function ActivityLogPage() {
-  const [logs, setLogs] = useState(initialActivityLogs)
+  const [logs, setLogs] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [actionFilter, setActionFilter] = useState('ALL')
+  const [meta, setMeta] = useState({ current_page: 1, last_page: 1, total: 0, per_page: 20 })
+  const [currentPage, setCurrentPage] = useState(1)
+  const [isLoading, setIsLoading] = useState(true)
+
+  const loadLogs = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const params = {
+        page: currentPage,
+        per_page: 20,
+      }
+      if (actionFilter !== 'ALL') params.action = actionFilter
+
+      const res = await activityLogService.getActivityLogs(params)
+      if (res?.data) {
+        setLogs(res.data)
+        if (res.meta) setMeta(res.meta)
+      }
+    } catch (err) {
+      console.error('Failed to load activity logs:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [currentPage, actionFilter])
+
+  useEffect(() => {
+    loadLogs()
+  }, [loadLogs])
 
   const filteredLogs = logs.filter((log) => {
-    if (actionFilter !== 'ALL' && log.action !== actionFilter) return false
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase()
       return (
-        log.operatorName.toLowerCase().includes(q) ||
-        log.description.toLowerCase().includes(q) ||
+        log.actor?.toLowerCase().includes(q) ||
+        log.description?.toLowerCase().includes(q) ||
         (log.target && log.target.toLowerCase().includes(q))
       )
     }
@@ -23,9 +51,10 @@ export default function ActivityLogPage() {
   const getActionBadge = (action) => {
     switch (action) {
       case 'TAKE_OVER':
+      case 'ASSIGN_OPERATOR':
         return (
           <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
-            TAKE OVER HITL
+            {action === 'TAKE_OVER' ? 'TAKE OVER HITL' : 'PENUGASAN'}
           </span>
         )
       case 'OPERATOR_RESPONSE':
@@ -34,22 +63,16 @@ export default function ActivityLogPage() {
             RESPONS OPERATOR
           </span>
         )
-      case 'ESCALATION_TRIGGER':
-        return (
-          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-            ESKALASI AI
-          </span>
-        )
-      case 'STATUS_RESOLVED':
-        return (
-          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-            RESOLVED
-          </span>
-        )
       case 'STATUS_CHANGE':
         return (
           <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
             UBAH STATUS
+          </span>
+        )
+      case 'OPERATOR_STATUS':
+        return (
+          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+            STATUS OPERATOR
           </span>
         )
       case 'LOGIN':
@@ -74,7 +97,7 @@ export default function ActivityLogPage() {
         <div className="flex items-center gap-1.5">
           <span className="material-symbols-outlined text-slate-400 text-sm">schedule</span>
           <span className="font-mono text-xs text-slate-700 font-medium">
-            {row.timestamp}
+            {row.date} {row.timestamp} WIB
           </span>
         </div>
       ),
@@ -82,7 +105,7 @@ export default function ActivityLogPage() {
     {
       header: 'Operator / Aktor',
       render: (row) => (
-        <span className="font-bold text-slate-900 text-xs">{row.operatorName}</span>
+        <span className="font-bold text-slate-900 text-xs">{row.actor}</span>
       ),
     },
     {
@@ -100,7 +123,7 @@ export default function ActivityLogPage() {
     {
       header: 'Deskripsi Aktivitas',
       render: (row) => (
-        <span className="text-xs text-slate-600 leading-relaxed block max-w-md">
+        <span className="text-xs text-slate-600 line-clamp-1 leading-relaxed">
           {row.description}
         </span>
       ),
@@ -108,7 +131,7 @@ export default function ActivityLogPage() {
     {
       header: 'Kanal',
       render: (row) => (
-        <span className="text-[11px] font-medium text-slate-500 uppercase">
+        <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-bold uppercase font-mono">
           {row.channel}
         </span>
       ),
@@ -121,54 +144,93 @@ export default function ActivityLogPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-            Activity Log & Audit Trail
+            Log Aktivitas & Audit Trail
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Riwayat kronologis seluruh tindakan intervensi operator, perubahan status tiket, dan eskalasi HITL
+            Catatan kronologis seluruh tindakan intervensi operator, pengalihan AI, dan perubahan status
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-500 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs font-medium">
-            Tercatat: <strong className="text-slate-900">{filteredLogs.length}</strong> entri aktivitas
-          </span>
-        </div>
-      </div>
-
-      {/* Filter Bar */}
-      <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="relative w-full sm:w-80">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">
-            search
-          </span>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cari nama operator, target #CV, atau deskripsi..."
-            className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/20"
-          />
-        </div>
-
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <select
-            value={actionFilter}
-            onChange={(e) => setActionFilter(e.target.value)}
-            className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer w-full sm:w-auto"
+          <button
+            onClick={loadLogs}
+            disabled={isLoading}
+            className="p-2 bg-white hover:bg-slate-50 text-slate-700 rounded-xl border border-slate-200 shadow-2xs text-xs font-semibold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            title="Muat Ulang"
           >
-            <option value="ALL">Semua Tipe Tindakan</option>
-            <option value="TAKE_OVER">Take Over HITL</option>
-            <option value="OPERATOR_RESPONSE">Respons Operator</option>
-            <option value="ESCALATION_TRIGGER">Eskalasi AI (Need Human)</option>
-            <option value="STATUS_RESOLVED">Penyelesaian Tiket</option>
-            <option value="STATUS_CHANGE">Perubahan Status</option>
-            <option value="LOGIN">Autentikasi Login</option>
-          </select>
+            <span className={`material-symbols-outlined text-base ${isLoading ? 'animate-spin' : ''}`}>
+              refresh
+            </span>
+            <span>Refresh</span>
+          </button>
         </div>
       </div>
 
-      {/* DataTable */}
-      <DataTable columns={columns} data={filteredLogs} />
+      {/* Filter & Table Card */}
+      <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+        {/* Table Filters */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="relative flex-1 max-w-md">
+            <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xl">
+              search
+            </span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari nama operator, target tiket, atau deskripsi..."
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <select
+              value={actionFilter}
+              onChange={(e) => {
+                setActionFilter(e.target.value)
+                setCurrentPage(1)
+              }}
+              className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
+            >
+              <option value="ALL">Semua Tindakan</option>
+              <option value="OPERATOR_RESPONSE">Respons Operator</option>
+              <option value="ASSIGN_OPERATOR">Penugasan</option>
+              <option value="STATUS_CHANGE">Ubah Status</option>
+              <option value="OPERATOR_STATUS">Status Kehadiran</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Table */}
+        {isLoading ? (
+          <div className="py-16 text-center text-slate-400 space-y-2">
+            <span className="material-symbols-outlined animate-spin text-3xl text-primary">
+              progress_activity
+            </span>
+            <p className="text-xs">Memuat log aktivitas...</p>
+          </div>
+        ) : (
+          <>
+            <DataTable
+              columns={columns}
+              data={filteredLogs}
+              emptyMessage="Belum ada catatan aktivitas yang sesuai dengan filter."
+            />
+
+            {meta.last_page > 1 && (
+              <div className="pt-2">
+                <Pagination
+                  currentPage={meta.current_page}
+                  totalPages={meta.last_page}
+                  totalItems={meta.total}
+                  itemsPerPage={meta.per_page}
+                  onPageChange={(p) => setCurrentPage(p)}
+                />
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   )
 }

@@ -1,10 +1,12 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import FilterBar from '../../components/admin/FilterBar'
 import StatusBadge from '../../components/admin/StatusBadge'
 import ChannelBadge from '../../components/admin/ChannelBadge'
 import CategoryBadge from '../../components/admin/CategoryBadge'
-import { initialConversations, initialOperators } from '../../data/adminMockData'
+import Pagination from '../../components/admin/Pagination'
+import conversationService from '../../services/conversationService'
+import operatorService from '../../services/operatorService'
 
 export default function ConversationsPage() {
   const navigate = useNavigate()
@@ -14,7 +16,7 @@ export default function ConversationsPage() {
 
   // Filter States
   const [activeTab, setActiveTab] = useState(
-    initialStatusFromUrl === 'NEED_HUMAN' ? 'hitl' : 'all'
+    initialStatusFromUrl === 'NEED_HUMAN' ? 'hitl' : initialStatusFromUrl.toLowerCase()
   )
   const [searchQuery, setSearchQuery] = useState('')
   const [channelFilter, setChannelFilter] = useState('ALL')
@@ -24,6 +26,14 @@ export default function ConversationsPage() {
   const [categoryFilter, setCategoryFilter] = useState('ALL')
   const [operatorFilter, setOperatorFilter] = useState('ALL')
 
+  // API States
+  const [conversations, setConversations] = useState([])
+  const [operators, setOperators] = useState([])
+  const [meta, setMeta] = useState({ current_page: 1, last_page: 1, total: 0, per_page: 15 })
+  const [currentPage, setCurrentPage] = useState(1)
+  const [isLoading, setIsLoading] = useState(true)
+  const [hitlCount, setHitlCount] = useState(0)
+
   const tabs = [
     { id: 'all', label: 'Semua Percakapan', icon: 'forum', filterStatus: 'ALL' },
     {
@@ -31,17 +41,84 @@ export default function ConversationsPage() {
       label: 'Perlu Tindakan (HITL)',
       icon: 'crisis_alert',
       filterStatus: 'NEED_HUMAN',
-      badge: '3',
-      badgeColor: 'bg-rose-500 text-white',
+      badge: hitlCount > 0 ? String(hitlCount) : null,
+      badgeColor: 'bg-rose-500 text-white animate-pulse',
     },
     { id: 'assigned', label: 'Ditugaskan', icon: 'person', filterStatus: 'ASSIGNED' },
     { id: 'pending', label: 'Pending', icon: 'schedule', filterStatus: 'PENDING' },
     { id: 'resolved', label: 'Selesai', icon: 'check_circle', filterStatus: 'RESOLVED' },
   ]
 
+  // Fetch Operators for filter dropdown
+  useEffect(() => {
+    async function loadOperators() {
+      try {
+        const res = await operatorService.getOperators()
+        if (res?.data) {
+          setOperators(res.data)
+        }
+      } catch (err) {
+        console.error('Failed to load operators:', err)
+      }
+    }
+    loadOperators()
+  }, [])
+
+  // Fetch Conversations from API
+  const fetchConversations = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const params = {
+        page: currentPage,
+        per_page: 15,
+      }
+
+      if (statusFilter === 'NEED_HUMAN') {
+        params.status = 'NEED_HUMAN'
+      } else if (statusFilter !== 'ALL') {
+        params.status = statusFilter
+      }
+
+      if (channelFilter !== 'ALL') params.channel = channelFilter
+      if (searchQuery.trim()) params.search = searchQuery.trim()
+
+      if (operatorFilter === 'UNASSIGNED') {
+        // Handle unassigned
+      } else if (operatorFilter !== 'ALL') {
+        const foundOp = operators.find((o) => o.id === operatorFilter || o.operator_id === Number(operatorFilter))
+        if (foundOp) params.operator_id = foundOp.operator_id
+      }
+
+      const res = await conversationService.getConversations(params)
+      if (res?.data) {
+        setConversations(res.data)
+        if (res.meta) setMeta(res.meta)
+      }
+
+      // Also fetch quick count for HITL badge if not on HITL tab
+      if (statusFilter !== 'NEED_HUMAN') {
+        const hitlRes = await conversationService.getConversations({ status: 'NEED_HUMAN', per_page: 1 })
+        if (hitlRes?.meta) {
+          setHitlCount(hitlRes.meta.total)
+        }
+      } else if (res?.meta) {
+        setHitlCount(res.meta.total)
+      }
+    } catch (err) {
+      console.error('Failed to fetch conversations:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [currentPage, statusFilter, channelFilter, searchQuery, operatorFilter, operators])
+
+  useEffect(() => {
+    fetchConversations()
+  }, [fetchConversations])
+
   const handleTabChange = (tab) => {
     setActiveTab(tab.id)
     setStatusFilter(tab.filterStatus)
+    setCurrentPage(1)
     if (tab.filterStatus === 'ALL') {
       searchParams.delete('status')
     } else {
@@ -57,56 +134,9 @@ export default function ConversationsPage() {
     setCategoryFilter('ALL')
     setOperatorFilter('ALL')
     setActiveTab('all')
+    setCurrentPage(1)
     setSearchParams({})
   }
-
-  // Filtered dataset
-  const filteredConversations = useMemo(() => {
-    return initialConversations.filter((conv) => {
-      // Tab / Status filter
-      if (statusFilter === 'NEED_HUMAN') {
-        if (!conv.needsHuman || conv.status === 'RESOLVED') return false
-      } else if (statusFilter !== 'ALL' && conv.status !== statusFilter) {
-        return false
-      }
-
-      // Channel filter
-      if (channelFilter !== 'ALL' && conv.channel !== channelFilter) {
-        return false
-      }
-
-      // Category filter
-      if (categoryFilter !== 'ALL' && conv.category !== categoryFilter) {
-        return false
-      }
-
-      // Operator filter
-      if (operatorFilter === 'UNASSIGNED' && conv.assignedOperator) {
-        return false
-      }
-      if (
-        operatorFilter !== 'ALL' &&
-        operatorFilter !== 'UNASSIGNED' &&
-        conv.assignedOperator?.id !== operatorFilter
-      ) {
-        return false
-      }
-
-      // Search Query
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase()
-        const matchId = conv.id.toLowerCase().includes(q)
-        const matchCitizen = conv.citizenName.toLowerCase().includes(q)
-        const matchLastMsg = conv.lastMessage.toLowerCase().includes(q)
-        const matchCategory = conv.category?.toLowerCase().includes(q)
-        if (!matchId && !matchCitizen && !matchLastMsg && !matchCategory) {
-          return false
-        }
-      }
-
-      return true
-    })
-  }, [searchQuery, channelFilter, statusFilter, categoryFilter, operatorFilter])
 
   return (
     <div className="space-y-5">
@@ -122,8 +152,19 @@ export default function ConversationsPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={fetchConversations}
+            disabled={isLoading}
+            className="p-2 bg-white hover:bg-slate-50 text-slate-700 rounded-xl border border-slate-200 shadow-2xs text-xs font-semibold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            title="Muat Ulang Data"
+          >
+            <span className={`material-symbols-outlined text-base ${isLoading ? 'animate-spin' : ''}`}>
+              refresh
+            </span>
+            <span className="hidden sm:inline">Refresh</span>
+          </button>
           <span className="text-xs text-slate-500 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs font-medium">
-            Total Sesuai Filter: <strong className="text-slate-900">{filteredConversations.length}</strong> percakapan
+            Total Sesuai Filter: <strong className="text-slate-900">{meta.total}</strong> percakapan
           </span>
         </div>
       </div>
@@ -154,12 +195,19 @@ export default function ConversationsPage() {
       {/* Advanced Filter Bar */}
       <FilterBar
         searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
+        onSearchChange={(val) => {
+          setSearchQuery(val)
+          setCurrentPage(1)
+        }}
         channelFilter={channelFilter}
-        onChannelChange={setChannelFilter}
+        onChannelChange={(val) => {
+          setChannelFilter(val)
+          setCurrentPage(1)
+        }}
         statusFilter={statusFilter}
         onStatusChange={(val) => {
           setStatusFilter(val)
+          setCurrentPage(1)
           if (val === 'NEED_HUMAN') setActiveTab('hitl')
           else if (val === 'ALL') setActiveTab('all')
           else if (val === 'ASSIGNED') setActiveTab('assigned')
@@ -169,14 +217,24 @@ export default function ConversationsPage() {
         categoryFilter={categoryFilter}
         onCategoryChange={setCategoryFilter}
         operatorFilter={operatorFilter}
-        onOperatorChange={setOperatorFilter}
-        operators={initialOperators}
+        onOperatorChange={(val) => {
+          setOperatorFilter(val)
+          setCurrentPage(1)
+        }}
+        operators={operators}
         onReset={handleResetFilter}
       />
 
       {/* Conversations List Card */}
       <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-        {filteredConversations.length === 0 ? (
+        {isLoading ? (
+          <div className="py-20 text-center space-y-3">
+            <span className="material-symbols-outlined animate-spin text-4xl text-primary">
+              progress_activity
+            </span>
+            <p className="text-xs font-medium text-slate-500">Memuat data percakapan...</p>
+          </div>
+        ) : conversations.length === 0 ? (
           <div className="py-16 text-center text-slate-400 space-y-3">
             <span className="material-symbols-outlined text-5xl text-slate-300">
               chat_bubble_outline
@@ -191,19 +249,19 @@ export default function ConversationsPage() {
             </div>
             <button
               onClick={handleResetFilter}
-              className="px-4 py-2 bg-primary text-white rounded-xl text-xs font-semibold cursor-pointer"
+              className="px-4 py-2 bg-primary text-white rounded-xl text-xs font-semibold cursor-pointer hover:bg-primary-container transition-colors"
             >
               Reset Semua Filter
             </button>
           </div>
         ) : (
           <div className="divide-y divide-slate-100">
-            {filteredConversations.map((conv) => (
+            {conversations.map((conv) => (
               <div
-                key={conv.id}
-                onClick={() => navigate(`/admin/conversations/${conv.id}`)}
+                key={conv.id || conv.conversation_id}
+                onClick={() => navigate(`/admin/conversations/${conv.id || conv.conversation_id}`)}
                 className={`p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50/80 transition-all cursor-pointer group ${
-                  conv.needsHuman && conv.status !== 'RESOLVED'
+                  conv.needs_human && conv.status !== 'RESOLVED'
                     ? 'bg-rose-50/25 border-l-4 border-l-rose-500'
                     : ''
                 }`}
@@ -222,15 +280,15 @@ export default function ConversationsPage() {
                         {conv.id}
                       </span>
                       <span className="text-xs font-bold text-slate-800">
-                        {conv.citizenName}
+                        {conv.citizen_name}
                       </span>
                       <ChannelBadge channel={conv.channel} />
                       <CategoryBadge category={conv.category} />
-                      <StatusBadge status={conv.status} needsHuman={conv.needsHuman} />
+                      <StatusBadge status={conv.status} needsHuman={conv.needs_human} />
                     </div>
 
                     <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed">
-                      {conv.lastMessage}
+                      {conv.last_message}
                     </p>
 
                     <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] text-slate-400">
@@ -239,7 +297,7 @@ export default function ConversationsPage() {
                         <span>
                           Operator:{' '}
                           <strong className="text-slate-700">
-                            {conv.assignedOperator ? conv.assignedOperator.name : 'Belum Ditugaskan'}
+                            {conv.assigned_operator ? conv.assigned_operator.name : 'Belum Ditugaskan'}
                           </strong>
                         </span>
                       </span>
@@ -247,20 +305,16 @@ export default function ConversationsPage() {
                       <span className="flex items-center gap-1">
                         <span className="material-symbols-outlined text-xs">schedule</span>
                         <span>
-                          {new Date(conv.updatedAt).toLocaleDateString('id-ID', {
-                            day: 'numeric',
-                            month: 'short',
-                          })}{' '}
-                          {new Date(conv.updatedAt).toLocaleTimeString('id-ID', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}{' '}
-                          WIB
+                          {conv.updated_at
+                            ? `${new Date(conv.updated_at).toLocaleDateString('id-ID', {
+                                day: 'numeric',
+                                month: 'short',
+                              })} ${new Date(conv.updated_at).toLocaleTimeString('id-ID', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })} WIB`
+                            : '-'}
                         </span>
-                      </span>
-                      <span>·</span>
-                      <span className="font-mono text-[10px] text-slate-400">
-                        Session: {conv.sessionId}
                       </span>
                     </div>
                   </div>
@@ -268,7 +322,7 @@ export default function ConversationsPage() {
 
                 {/* Right Side Actions */}
                 <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
-                  {conv.needsHuman && conv.status !== 'RESOLVED' && (
+                  {conv.needs_human && conv.status !== 'RESOLVED' && (
                     <span className="px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1">
                       <span className="material-symbols-outlined text-xs animate-bounce">
                         warning
@@ -281,7 +335,7 @@ export default function ConversationsPage() {
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation()
-                      navigate(`/admin/conversations/${conv.id}`)
+                      navigate(`/admin/conversations/${conv.id || conv.conversation_id}`)
                     }}
                     className="px-3.5 py-1.5 bg-slate-100 group-hover:bg-primary group-hover:text-white text-slate-700 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
                   >
@@ -291,6 +345,19 @@ export default function ConversationsPage() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {meta.last_page > 1 && (
+          <div className="p-4 border-t border-slate-100">
+            <Pagination
+              currentPage={meta.current_page}
+              totalPages={meta.last_page}
+              totalItems={meta.total}
+              itemsPerPage={meta.per_page}
+              onPageChange={(p) => setCurrentPage(p)}
+            />
           </div>
         )}
       </div>
