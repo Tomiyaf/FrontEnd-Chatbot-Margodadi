@@ -1,13 +1,6 @@
 import api from './api'
 
 export const researchService = {
-  getPreview: async (period = 'MONTH') => {
-    const response = await api.get('/admin/research/preview', {
-      params: { period },
-    })
-    return response.data
-  },
-
   exportCsv: async (params = {}) => {
     const queryParams = new URLSearchParams()
     if (params.period) queryParams.append('period', params.period)
@@ -16,7 +9,7 @@ export const researchService = {
       queryParams.append('fields', fieldList)
     }
 
-    const response = await api.get(`/admin/research/export-csv?${queryParams.toString()}`, {
+    const response = await api.get(`/admin/education/export-csv?${queryParams.toString()}`, {
       responseType: 'blob',
     })
 

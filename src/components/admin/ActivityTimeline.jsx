@@ -27,6 +27,12 @@ export default function ActivityTimeline({ activities = [], className = '' }) {
         return { icon: 'download', color: 'bg-teal-100 text-teal-700' }
       case 'CHAT_SESSION_START':
         return { icon: 'forum', color: 'bg-blue-100 text-blue-700' }
+      case 'VECTOR_DOC_CREATE':
+      case 'VECTOR_DOC_UPDATE':
+      case 'VECTOR_DOC_DELETE':
+      case 'VECTOR_REINDEX':
+      case 'VECTOR_REINDEX_ALL':
+        return { icon: 'hub', color: 'bg-indigo-100 text-indigo-700' }
       case 'FEEDBACK_SUBMITTED':
         return { icon: 'star', color: 'bg-amber-100 text-amber-700' }
       default:

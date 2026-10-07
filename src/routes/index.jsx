@@ -14,7 +14,7 @@ import OperatorsPage from '../pages/admin/OperatorsPage'
 import AnalyticsPage from '../pages/admin/AnalyticsPage'
 import EducationPage from '../pages/admin/EducationPage'
 import ReportsPage from '../pages/admin/ReportsPage'
-import ResearchExportPage from '../pages/admin/ResearchExportPage'
+import KnowledgeBasePage from '../pages/admin/KnowledgeBasePage'
 import ActivityLogPage from '../pages/admin/ActivityLogPage'
 import SettingsPage from '../pages/admin/SettingsPage'
 import NotFoundPage from '../pages/NotFoundPage'
@@ -113,8 +113,12 @@ export const router = createBrowserRouter([
         element: <ReportsPage />,
       },
       {
+        path: 'knowledge-base',
+        element: <KnowledgeBasePage />,
+      },
+      {
         path: 'research-export',
-        element: <ResearchExportPage />,
+        element: <Navigate to="/admin/knowledge-base" replace />,
       },
       {
         path: 'activity-log',

@@ -93,9 +93,9 @@ export default function AdminLayout() {
       roles: ['ADMIN'],
     },
     {
-      label: 'Export Data Riset',
-      path: '/admin/research-export',
-      icon: 'ios_share',
+      label: 'Knowledge Base & Vektor AI',
+      path: '/admin/knowledge-base',
+      icon: 'hub',
       roles: ['ADMIN'],
     },
     {

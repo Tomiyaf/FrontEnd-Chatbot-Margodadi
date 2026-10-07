@@ -131,6 +131,17 @@ export default function ActivityLogPage() {
             <span>SESI WARGA</span>
           </span>
         )
+      case 'VECTOR_DOC_CREATE':
+      case 'VECTOR_DOC_UPDATE':
+      case 'VECTOR_DOC_DELETE':
+      case 'VECTOR_REINDEX':
+      case 'VECTOR_REINDEX_ALL':
+        return (
+          <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 inline-flex items-center gap-1">
+            <span className="material-symbols-outlined text-xs">hub</span>
+            <span>DATA VEKTOR AI</span>
+          </span>
+        )
       case 'FEEDBACK_SUBMITTED':
         return (
           <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200 inline-flex items-center gap-1">
@@ -323,6 +334,7 @@ export default function ActivityLogPage() {
               <option value="SETTING_CHANGE">Konfigurasi RAG</option>
               <option value="PROFILE_UPDATE">Pembaruan Profil</option>
               <option value="PASSWORD_CHANGE">Ubah Kata Sandi</option>
+              <option value="VECTOR_DOC_CREATE,VECTOR_DOC_UPDATE,VECTOR_DOC_DELETE,VECTOR_REINDEX,VECTOR_REINDEX_ALL">Data Vektor & Knowledge Base</option>
               <option value="RESEARCH_EXPORT">Ekspor Dataset Penelitian</option>
               <option value="CHAT_SESSION_START">Sesi Percakapan Warga</option>
               <option value="FEEDBACK_SUBMITTED">Feedback & Rating Warga</option>
