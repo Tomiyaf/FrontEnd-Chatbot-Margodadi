@@ -55,6 +55,15 @@ export default function DashboardPage() {
   const hitlQueue = dashboardData?.recent_hitl || []
   const recentActivities = dashboardData?.recent_activities || []
 
+  const currentMonthLabel = new Date().toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })
+  const periodLabel = dashboardData?.period?.label || (
+    selectedPeriod === 'TODAY'
+      ? 'Hari Ini'
+      : selectedPeriod === 'WEEK'
+        ? '7 Hari Terakhir'
+        : new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
+  )
+
   return (
     <div className="space-y-6">
       {/* 1. TOP HITL ESCALATION ALERT BANNER */}
@@ -116,7 +125,7 @@ export default function DashboardPage() {
           {[
             { label: 'Hari Ini', val: 'TODAY' },
             { label: '7 Hari', val: 'WEEK' },
-            { label: 'Bulan Ini (Sep 2026)', val: 'MONTH' },
+            { label: `Bulan Ini (${currentMonthLabel})`, val: 'MONTH' },
           ].map((tab) => (
             <button
               key={tab.val}
@@ -140,8 +149,8 @@ export default function DashboardPage() {
           value={loading ? '...' : (kpi.total_conversations || 0).toLocaleString('id-ID')}
           subtitle="Semua sesi layanan"
           icon="mark_chat_unread"
-          trend="+14.2% bln lalu"
-          trendType="positive"
+          trend={kpi.growth_trend || '+0% sesi'}
+          trendType={kpi.growth_type || 'positive'}
         />
 
         <StatCard
@@ -157,7 +166,7 @@ export default function DashboardPage() {
           value={loading ? '...' : (kpi.need_human_count || 0)}
           subtitle="Eskalasi Human (HITL)"
           icon="crisis_alert"
-          trend="Perlu respon"
+          trend={`${kpi.need_human_count || 0} Perlu respon`}
           trendType="warning"
           onClick={() => navigate('/admin/conversations?status=NEED_HUMAN')}
           className="ring-2 ring-rose-300/60 bg-rose-50/20"
@@ -168,7 +177,7 @@ export default function DashboardPage() {
           value={loading ? '...' : (kpi.assigned_count || 0)}
           subtitle="Oleh operator pekon"
           icon="support_agent"
-          trend="Sedang diproses"
+          trend={`${kpi.assigned_count || 0} Diproses`}
           trendType="neutral"
         />
 
@@ -177,7 +186,7 @@ export default function DashboardPage() {
           value={loading ? '...' : (kpi.total_resolved || 0).toLocaleString('id-ID')}
           subtitle="Tuntas terlayani"
           icon="verified"
-          trend="Terselesaikan"
+          trend={`${kpi.resolved_today || 0} hari ini`}
           trendType="positive"
         />
       </div>
@@ -192,7 +201,7 @@ export default function DashboardPage() {
                 <span className="material-symbols-outlined text-base text-primary">hub</span>
                 Distribusi Kanal Interaksi
               </h3>
-              <span className="text-[11px] text-slate-400 font-medium">Sep 2026</span>
+              <span className="text-[11px] text-slate-400 font-medium">{periodLabel}</span>
             </div>
 
             <div className="space-y-3">
@@ -239,20 +248,16 @@ export default function DashboardPage() {
               <div className="bg-emerald-50 border border-emerald-200 p-2.5 rounded-lg">
                 <span className="text-[10px] text-emerald-800 font-bold uppercase">Dijawab AI RAG</span>
                 <p className="text-xl font-black text-emerald-800">
-                  {kpi.total_conversations > 0
-                    ? `${Math.round(((kpi.total_conversations - kpi.need_human_count) / kpi.total_conversations) * 100)}%`
-                    : '85%'}
+                  {kpi.automated_percent ?? (kpi.total_conversations > 0 ? Math.round(((kpi.total_conversations - kpi.need_human_count) / kpi.total_conversations) * 100) : 0)}%
                 </p>
                 <span className="text-[10px] text-emerald-700 font-medium">
-                  {Math.max(0, (kpi.total_conversations || 0) - (kpi.need_human_count || 0))} sesi otomatis
+                  {kpi.automated_count ?? Math.max(0, (kpi.total_conversations || 0) - (kpi.need_human_count || 0))} sesi otomatis
                 </span>
               </div>
               <div className="bg-amber-50 border border-amber-200 p-2.5 rounded-lg">
                 <span className="text-[10px] text-amber-800 font-bold uppercase">Bantuan Operator</span>
                 <p className="text-xl font-black text-amber-800">
-                  {kpi.total_conversations > 0
-                    ? `${Math.round((kpi.need_human_count / kpi.total_conversations) * 100)}%`
-                    : '15%'}
+                  {kpi.hitl_percent ?? (kpi.total_conversations > 0 ? Math.round((kpi.need_human_count / kpi.total_conversations) * 100) : 0)}%
                 </p>
                 <span className="text-[10px] text-amber-700 font-medium">{kpi.need_human_count || 0} sesi HITL</span>
               </div>
@@ -299,7 +304,7 @@ export default function DashboardPage() {
             <div>
               <span className="text-slate-500 block text-[11px]">Rata-rata Waktu Respon Operator</span>
               <strong className="text-slate-900 text-sm font-bold">
-                {kpi.avg_response_time || '2.4 mnt'}
+                {kpi.avg_response_time || '-'}
               </strong>
             </div>
             <span className="px-2 py-1 rounded-md bg-emerald-100 text-emerald-800 font-bold text-[11px]">

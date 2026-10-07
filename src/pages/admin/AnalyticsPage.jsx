@@ -59,7 +59,7 @@ export default function AnalyticsPage() {
           {[
             { label: '7 Hari', val: 'WEEK' },
             { label: 'Bulan Ini', val: 'MONTH' },
-            { label: 'Kuartal 3 (2026)', val: 'Q3' },
+            { label: `Kuartal ${Math.ceil((new Date().getMonth() + 1) / 3)} (${new Date().getFullYear()})`, val: 'Q3' },
           ].map((tab) => (
             <button
               key={tab.val}
@@ -92,15 +92,15 @@ export default function AnalyticsPage() {
               value={kpi.totalConversations.toLocaleString('id-ID')}
               subtitle="Trafik layanan pekon"
               icon="insights"
-              trend="+18.4% YoY"
-              trendType="positive"
+              trend={kpi.growthTrend || '+0% sesi aktif'}
+              trendType={kpi.growthType || 'positive'}
             />
             <StatCard
               title="Efisiensi AI RAG"
               value={kpi.autoResponseRatio}
               subtitle="Dijawab tanpa manusia"
               icon="smart_toy"
-              trend="Respon otomatis akurat"
+              trend={`${kpi.autoResolvedConversations || 0} sesi mandiri AI`}
               trendType="positive"
             />
             <StatCard
@@ -108,7 +108,7 @@ export default function AnalyticsPage() {
               value={kpi.humanInterventionRatio}
               subtitle="Memerlukan operator"
               icon="support_agent"
-              trend="Teralihkan ke operator"
+              trend={`${kpi.escalatedConversations || 0} sesi dialihkan`}
               trendType="neutral"
             />
             <StatCard
@@ -116,7 +116,7 @@ export default function AnalyticsPage() {
               value={`${kpi.avgOperatorResponseTimeMinutes} mnt`}
               subtitle="Respon operator pekon"
               icon="timer"
-              trend="Target < 5.0 mnt"
+              trend="SLA Target < 5.0 mnt"
               trendType="positive"
             />
           </div>

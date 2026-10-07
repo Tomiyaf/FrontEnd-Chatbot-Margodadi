@@ -1,7 +1,10 @@
 import { useState } from 'react'
 
 export default function HITLActionPanel({
-  conversation,
+  conversation = {},
+  channel,
+  isAssigned,
+  assignedOperator,
   operators = [],
   currentOperator,
   onTakeOver,
@@ -9,18 +12,28 @@ export default function HITLActionPanel({
   onStatusChange,
   onSendMessage,
   onResolve,
+  isSending = false,
+  disabled = false,
 }) {
+  const effectiveChannel = channel || conversation?.channel || 'web'
+  const effectiveAssignedOperator =
+    assignedOperator ||
+    conversation?.assigned_operator ||
+    conversation?.assignedOperator ||
+    null
+
   const [selectedOperatorId, setSelectedOperatorId] = useState(
-    conversation.assignedOperator?.id || ''
+    effectiveAssignedOperator?.operator_id || effectiveAssignedOperator?.id || ''
   )
-  const [selectedStatus, setSelectedStatus] = useState(conversation.status || 'OPEN')
+  const [selectedStatus, setSelectedStatus] = useState(conversation?.status || 'OPEN')
   const [replyContent, setReplyContent] = useState('')
-  const [isSending, setIsSending] = useState(false)
+  const [localSending, setLocalSending] = useState(false)
 
   const isAssignedToMe =
-    conversation.assignedOperator &&
+    effectiveAssignedOperator &&
     currentOperator &&
-    conversation.assignedOperator.id === currentOperator.id
+    (effectiveAssignedOperator.id === currentOperator.id ||
+      effectiveAssignedOperator.operator_id === currentOperator.operator_id)
 
   const quickTemplates = [
     'Selamat pagi/siang, mohon lampirkan fotokopi KTP & KK untuk kelengkapan berkas.',
@@ -29,15 +42,18 @@ export default function HITLActionPanel({
     'Informasi Bank Sampah Berkah dapat diakses di Balai Dusun 1 setiap Minggu ke-2 dan ke-4.',
   ]
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault()
-    if (!replyContent.trim()) return
-    setIsSending(true)
-    setTimeout(() => {
-      onSendMessage(replyContent)
+    if (!replyContent.trim() || isSending || localSending || disabled) return
+    setLocalSending(true)
+    try {
+      if (onSendMessage) {
+        await onSendMessage(replyContent)
+      }
       setReplyContent('')
-      setIsSending(false)
-    }, 400)
+    } finally {
+      setLocalSending(false)
+    }
   }
 
   const handleApplyAssignment = () => {

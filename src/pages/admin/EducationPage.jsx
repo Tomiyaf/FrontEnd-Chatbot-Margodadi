@@ -14,7 +14,12 @@ export default function EducationPage() {
     completedSessions: 0,
     inProgressSessions: 0,
     completionRate: 0,
-    popularTopic: 'Bank Sampah',
+    growthTrend: '',
+    growthType: 'neutral',
+    avgQuizScore: '-',
+    completionTrend: '',
+    popularTopic: '-',
+    popularTopicSubtitle: '',
     topicBreakdown: [],
   })
   const [searchQuery, setSearchQuery] = useState('')
@@ -175,18 +180,18 @@ export default function EducationPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Total Sesi Edukasi"
-          value={stats.totalSessions || sessions.length}
+          value={stats.totalSessions ?? sessions.length}
           subtitle="Partisipasi warga desa"
           icon="school"
-          trend="+22.5% minggu ini"
-          trendType="positive"
+          trend={stats.growthTrend || '+0 sesi minggu ini'}
+          trendType={stats.growthType || 'neutral'}
         />
         <StatCard
           title="Sesi Tuntas (Completed)"
           value={stats.completedSessions}
           subtitle={`${stats.completionRate}% kelulusan modul`}
           icon="task_alt"
-          trend="Tingkat pemahaman tinggi"
+          trend={stats.completionTrend || 'Tingkat pemahaman tinggi'}
           trendType="positive"
         />
         <StatCard
@@ -199,7 +204,7 @@ export default function EducationPage() {
         <StatCard
           title="Topik Populer"
           value={stats.popularTopic}
-          subtitle="Komoditas ekonomi 3R"
+          subtitle={stats.popularTopicSubtitle || 'Modul unggulan warga'}
           icon="recycling"
           badge="Modul Unggulan"
         />
@@ -212,26 +217,25 @@ export default function EducationPage() {
           Sebaran Topik Modul Edukasi Sampah (PKM Margodadi 2026)
         </h3>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-1">
-          {(stats.topicBreakdown && stats.topicBreakdown.length > 0
-            ? stats.topicBreakdown
-            : [
-                { name: 'Pemilahan Sampah', count: 98, pct: '30.6%', color: 'border-emerald-200 bg-emerald-50/50' },
-                { name: 'Prinsip 3R Terapan', count: 82, pct: '25.6%', color: 'border-indigo-200 bg-indigo-50/50' },
-                { name: 'Bank Sampah Berkah', count: 68, pct: '21.3%', color: 'border-amber-200 bg-amber-50/50' },
-                { name: 'Bahaya Bakar Sampah', count: 42, pct: '13.1%', color: 'border-rose-200 bg-rose-50/50' },
-                { name: 'Komposting Sederhana', count: 30, pct: '9.4%', color: 'border-teal-200 bg-teal-50/50' },
-              ]
-          ).map((topic, idx) => (
-            <div key={idx} className={`p-3.5 rounded-xl border ${topic.color} space-y-1`}>
-              <span className="text-xs font-bold text-slate-800 block truncate">{topic.name}</span>
-              <div className="flex justify-between items-baseline pt-1">
-                <span className="text-lg font-black text-slate-900">{topic.count}</span>
-                <span className="text-[11px] font-bold text-slate-500 font-mono">{topic.pct}</span>
+        {stats.topicBreakdown && stats.topicBreakdown.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-1">
+            {stats.topicBreakdown.map((topic, idx) => (
+              <div key={idx} className={`p-3.5 rounded-xl border ${topic.color} space-y-1`}>
+                <span className="text-xs font-bold text-slate-800 block truncate" title={topic.name}>
+                  {topic.name}
+                </span>
+                <div className="flex justify-between items-baseline pt-1">
+                  <span className="text-lg font-black text-slate-900">{topic.count}</span>
+                  <span className="text-[11px] font-bold text-slate-500 font-mono">{topic.pct}</span>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="py-6 text-center text-xs text-slate-400">
+            Belum ada data topik edukasi tercatat di database.
+          </div>
+        )}
       </div>
 
       {/* Filter & Data Table */}

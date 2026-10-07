@@ -2,17 +2,33 @@ export default function ActivityTimeline({ activities = [], className = '' }) {
   const getActionIcon = (action) => {
     switch (action) {
       case 'TAKE_OVER':
+      case 'HITL_ESCALATION':
+      case 'ESCALATION_TRIGGER':
         return { icon: 'front_hand', color: 'bg-rose-100 text-rose-700' }
       case 'OPERATOR_RESPONSE':
         return { icon: 'chat', color: 'bg-sky-100 text-sky-700' }
-      case 'ESCALATION_TRIGGER':
-        return { icon: 'warning', color: 'bg-amber-100 text-amber-700' }
+      case 'ASSIGN_OPERATOR':
+        return { icon: 'person_add', color: 'bg-violet-100 text-violet-700' }
       case 'STATUS_RESOLVED':
         return { icon: 'check_circle', color: 'bg-emerald-100 text-emerald-700' }
       case 'STATUS_CHANGE':
         return { icon: 'sync_alt', color: 'bg-indigo-100 text-indigo-700' }
+      case 'OPERATOR_STATUS':
+        return { icon: 'badge', color: 'bg-amber-100 text-amber-700' }
       case 'LOGIN':
-        return { icon: 'login', color: 'bg-purple-100 text-purple-700' }
+        return { icon: 'login', color: 'bg-emerald-100 text-emerald-700' }
+      case 'LOGOUT':
+        return { icon: 'logout', color: 'bg-slate-100 text-slate-700' }
+      case 'SETTING_CHANGE':
+      case 'PROFILE_UPDATE':
+      case 'PASSWORD_CHANGE':
+        return { icon: 'settings', color: 'bg-slate-100 text-slate-700' }
+      case 'RESEARCH_EXPORT':
+        return { icon: 'download', color: 'bg-teal-100 text-teal-700' }
+      case 'CHAT_SESSION_START':
+        return { icon: 'forum', color: 'bg-blue-100 text-blue-700' }
+      case 'FEEDBACK_SUBMITTED':
+        return { icon: 'star', color: 'bg-amber-100 text-amber-700' }
       default:
         return { icon: 'info', color: 'bg-slate-100 text-slate-700' }
     }

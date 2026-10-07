@@ -252,12 +252,19 @@ export default function ConversationDetailPage() {
 
           {/* HITL Intervention & Reply Form */}
           <HITLActionPanel
+            conversation={conversation}
             channel={conversation.channel}
             isAssigned={!!conversation.assigned_operator}
             assignedOperator={conversation.assigned_operator}
             onSendMessage={handleSendMessage}
             isSending={isSending}
             disabled={conversation.status === 'RESOLVED'}
+            operators={operators}
+            currentOperator={activeOperator}
+            onTakeOver={handleTakeOver}
+            onAssign={handleAssignOperator}
+            onStatusChange={handleStatusChange}
+            onResolve={handleResolve}
           />
         </div>
 
