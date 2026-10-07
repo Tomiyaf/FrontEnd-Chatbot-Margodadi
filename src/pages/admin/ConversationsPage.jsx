@@ -65,8 +65,8 @@ export default function ConversationsPage() {
   }, [])
 
   // Fetch Conversations from API
-  const fetchConversations = useCallback(async () => {
-    setIsLoading(true)
+  const fetchConversations = useCallback(async (isQuiet = false) => {
+    if (!isQuiet) setIsLoading(true)
     try {
       const params = {
         page: currentPage,
@@ -107,12 +107,19 @@ export default function ConversationsPage() {
     } catch (err) {
       console.error('Failed to fetch conversations:', err)
     } finally {
-      setIsLoading(false)
+      if (!isQuiet) setIsLoading(false)
     }
   }, [currentPage, statusFilter, channelFilter, searchQuery, operatorFilter, operators])
 
   useEffect(() => {
     fetchConversations()
+
+    // Auto-polling interval every 8 seconds for live inbox updates
+    const interval = setInterval(() => {
+      fetchConversations(true)
+    }, 8000)
+
+    return () => clearInterval(interval)
   }, [fetchConversations])
 
   const handleTabChange = (tab) => {

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
+import chatbotService from '../../services/chatbotService'
 
 const initialMessages = [
   {
@@ -8,67 +9,15 @@ const initialMessages = [
     text: 'Halo Warga Pekon Margodadi! Saya **Virtual Guide resmi Pekon Margodadi**. Ada yang dapat saya bantu terkait administrasi surat, syarat perizinan, produk UMKM desa, atau panduan pengelolaan sampah mandiri hari ini?',
     timestamp: '09:15 WIB',
   },
-  {
-    id: 'msg-2',
-    sender: 'user',
-    text: 'Selamat pagi min, saya mau tanya berkas persyaratan buat bikin Surat Keterangan Usaha (SKU) untuk pengajuan KUR bank, apa saja ya?',
-    timestamp: '09:16 WIB',
-  },
-  {
-    id: 'msg-3',
-    sender: 'bot',
-    text: 'Selamat pagi! Untuk pembuatan **Surat Keterangan Usaha (SKU)** di Kantor Pekon Margodadi sebagai syarat kelengkapan Kredit Usaha Rakyat (KUR), berikut persyaratan dan ketentuannya:',
-    timestamp: '09:17 WIB',
-    inferenceTime: '620ms',
-    richContent: {
-      checkpoints: [
-        'Fotokopi KTP Pemohon (Aktif)',
-        'Fotokopi Kartu Keluarga (KK)',
-        'Surat Pengantar RT setempat',
-        'Foto fisik tempat/kegiatan usaha',
-      ],
-      sla: '≤ 1 Hari Kerja',
-      fee: 'GRATIS (Rp 0,-)',
-      citation: {
-        title: 'SOP-PM-2024 Bagian 3 (Pelayanan SKU Mikro)',
-        relevance: '98%',
-        similarity: 'Cosine Similarity 0.982',
-        quote:
-          '“Pasal 4 Ayat 2: Pelaku usaha mikro yang berdomisili di Pekon Margodadi berhak memperoleh SKU tanpa pungutan biaya, ditandatangani oleh Kepala Pekon atau Kasi Pelayanan dalam kurun waktu 1 (satu) hari kerja setelah berkas fisik/digital dinyatakan lengkap.”',
-      },
-      actions: [
-        { label: 'Buat SKU di Layanan Publik', link: '/layanan-publik', icon: 'description' },
-        { label: 'Lihat Direktori UMKM', link: '/potensi-umkm', icon: 'storefront' },
-      ],
-    },
-  },
-  {
-    id: 'msg-4',
-    sender: 'user',
-    text: 'Kalau saya tidak punya pengantar RT karena Ketua RT sedang dinas luar kota sampai minggu depan bagaimana solusinya ya min? Butuh mendesak hari ini.',
-    timestamp: '09:18 WIB',
-  },
-  {
-    id: 'msg-5',
-    sender: 'system',
-    text: 'Eskalasi Diskresi Administrasi Diaktifkan. Pertanyaan Anda menyangkut pengecualian aparatur wilayah. Sistem secara otomatis menghubungkan percakapan ke Aparatur Pekon.',
-    timestamp: '09:18 WIB',
-  },
-  {
-    id: 'msg-6',
-    sender: 'operator',
-    operatorName: 'Dewi Lestari',
-    operatorRole: 'Kasi Pelayanan Pekon',
-    operatorAvatar:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCJiUP4EFFyg8VmjNLkwguRcXBjHsTg2Olj4mZ1siG7OraQdbZeP3aQwyjsFgIniDHuZbZ2obeUOt1VGMVYvAkw6RL938E_ITdYilQUixmB87yUPJan6gDJ8yU6ts9Yl6Fvk1MJaS4PFMyJ5zHMIpur7IAzzepXzed2D_jTV9B3KBewWmhCGQDQ3SUahhSze9_twdBPmGFXqpTYJSV0Jto8tAF22ainVvZiuUW81ZhoiX1WJTAw0r0',
-    text: 'Selamat pagi Bapak/Ibu. Jangan khawatir, terkait kondisi Ketua RT yang berhalangan hadir atau sedang dinas luar kota, kami memiliki mekanisme diskresi pelayanan terpadu:\n\n1. Anda dapat meminta tanda tangan pengantar pengganti dari **Sekretaris RT** setempat, atau;\n2. Langsung mendatangi **Kepala Dusun (Kadus)** wilayah Anda dengan membawa berkas identitas lengkap (KTP & KK).\n\nSetelah ditandatangani oleh Kadus, silakan langsung menuju ke loket Balai Pekon Margodadi. Loket pelayanan kami buka dan siap memproses hingga pukul **15.30 WIB** hari ini.',
-    timestamp: '09:19 WIB',
-  },
 ]
 
 export default function TanyaVirtualGuidePage() {
   const [searchParams] = useSearchParams()
   const [messages, setMessages] = useState(initialMessages)
+  const [sessionId, setSessionId] = useState(() => localStorage.getItem('vg_public_session') || '')
+  const [anonymousCode, setAnonymousCode] = useState(() => localStorage.getItem('vg_citizen_code') || '')
+  const [conversationId, setConversationId] = useState(null)
+
   const [inputText, setInputText] = useState(() => {
     const promptQuery = searchParams.get('prompt')
     const layananQuery = searchParams.get('layanan')
@@ -99,6 +48,57 @@ export default function TanyaVirtualGuidePage() {
     }, 3200)
   }
 
+  // Init session on mount
+  useEffect(() => {
+    const initChatbot = async () => {
+      try {
+        const res = await chatbotService.initSession({
+          session_id: sessionId || undefined,
+          anonymous_code: anonymousCode || undefined,
+        })
+        if (res?.data) {
+          setSessionId(res.data.session_id)
+          setAnonymousCode(res.data.anonymous_code)
+          setConversationId(res.data.conversation_id)
+          localStorage.setItem('vg_public_session', res.data.session_id)
+          localStorage.setItem('vg_citizen_code', res.data.anonymous_code)
+        }
+      } catch (err) {
+        console.warn('Failed to init chatbot session:', err)
+      }
+    }
+    initChatbot()
+  }, [])
+
+  // Sync operator messages in real-time when in an active conversation
+  useEffect(() => {
+    if (!conversationId) return
+
+    const syncInterval = setInterval(async () => {
+      try {
+        const res = await chatbotService.syncMessages({ conversation_id: conversationId })
+        if (res?.data?.messages && res.data.messages.length > 0) {
+          const serverMessages = res.data.messages
+          setMessages((prevMessages) => {
+            // Find any operator messages from server not yet in local state
+            const missingOpMessages = serverMessages.filter(
+              (sm) => sm.sender === 'operator' && !prevMessages.some((pm) => pm.text === sm.text)
+            )
+
+            if (missingOpMessages.length > 0) {
+              return [...prevMessages, ...missingOpMessages]
+            }
+            return prevMessages
+          })
+        }
+      } catch (err) {
+        // Silent catch for background polling
+      }
+    }, 5000)
+
+    return () => clearInterval(syncInterval)
+  }, [conversationId])
+
   // Scroll chat messages container on new message without moving whole window
   useEffect(() => {
     if (dialogueContainerRef.current) {
@@ -118,7 +118,7 @@ export default function TanyaVirtualGuidePage() {
     }
   }
 
-  const handleSend = (textToSend) => {
+  const handleSend = async (textToSend) => {
     const text = (textToSend || inputText).trim()
     if (!text) return
 
@@ -138,161 +138,60 @@ export default function TanyaVirtualGuidePage() {
       textareaRef.current.style.height = 'auto'
     }
 
-    // Simulate RAG Intelligent Response
     setIsTyping(true)
-    setTimeout(() => {
-      generateRagResponse(text, currentTime)
+    try {
+      const res = await chatbotService.sendMessage({
+        message: text,
+        session_id: sessionId || undefined,
+        anonymous_code: anonymousCode || undefined,
+        citizen_name: 'Warga Margodadi',
+      })
+
+      if (res?.data?.message) {
+        const botReply = res.data.message
+        if (res.data.conversation_id) {
+          setConversationId(res.data.conversation_id)
+        }
+
+        if (botReply.needsHuman) {
+          const handoverNotice = {
+            id: getNextId('handover'),
+            sender: 'system',
+            text: 'Eskalasi Diskresi Administrasi Diaktifkan. Sistem secara otomatis menghubungkan percakapan ke Aparatur Pekon Margodadi.',
+            timestamp: currentTime,
+          }
+          setMessages((prev) => [...prev, handoverNotice, botReply])
+        } else {
+          setMessages((prev) => [...prev, botReply])
+        }
+      }
+    } catch (err) {
+      console.error('Chatbot request error:', err)
+      const errorMsg = {
+        id: getNextId('err'),
+        sender: 'bot',
+        text: 'Mohon maaf, terjadi kendala saat menghubungi server basis pengetahuan Pekon Margodadi. Silakan coba kembali sesaat lagi.',
+        timestamp: currentTime,
+      }
+      setMessages((prev) => [...prev, errorMsg])
+    } finally {
       setIsTyping(false)
-    }, 850)
+    }
   }
 
-  const generateRagResponse = (query, timeStr) => {
-    const q = query.toLowerCase()
-    let reply = {
-      id: getNextId('bot'),
-      sender: 'bot',
-      timestamp: timeStr,
-      inferenceTime: '540ms',
-    }
-
-    if (q.includes('sku') || q.includes('usaha') || q.includes('kur') || q.includes('modal')) {
-      reply.text =
-        'Berdasarkan basis data **SOP Layanan Pekon Margodadi (SOP-PM-2024)**, permohonan **Surat Keterangan Usaha (SKU)** dapat diproses di Loket Kasi Pelayanan.'
-      reply.richContent = {
-        checkpoints: [
-          'Fotokopi KTP Pemohon (Warga Margodadi)',
-          'Fotokopi Kartu Keluarga (KK)',
-          'Surat Pengantar RT setempat',
-          'Dokumentasi foto tempat/kegiatan produksi',
-        ],
-        sla: '1 Hari Kerja',
-        fee: 'GRATIS (Rp 0,-)',
-        citation: {
-          title: 'SOP-PM-2024 Bagian 3: Pelayanan Usaha Mikro',
-          relevance: '99%',
-          similarity: 'Cosine Similarity 0.991',
-          quote:
-            '“Penerbitan SKU bagi pelaku usaha warga Pekon Margodadi ditujukan untuk legalitas perbankan, KUR, dan pembinaan tanpa pungutan retribusi.”',
-        },
-        actions: [
-          { label: 'Lihat Layanan Publik', link: '/layanan-publik', icon: 'description' },
-          { label: 'Katalog UMKM Desa', link: '/potensi-umkm', icon: 'storefront' },
-        ],
-      }
-    } else if (q.includes('sampah') || q.includes('bank sampah') || q.includes('tps3r') || q.includes('maggot')) {
-      reply.text =
-        'Terkait **Pengelolaan Sampah & Bank Sampah Pekon Margodadi**, pekon kami menerapkan pemilahan 3 kategori (Organik, Anorganik/Daur Ulang, dan Residu).'
-      reply.richContent = {
-        checkpoints: [
-          'Penyetoran Bank Sampah: Setiap Sabtu (08.30 – 12.00 WIB)',
-          'Sampah anorganik wajib bersih & kering (botol, kardus, plastik)',
-          'Buku Tabungan Sampah diterbitkan gratis bagi nasabah baru',
-          'Sampah organik diolah menjadi pakan maggot BSF & pupuk kompos',
-        ],
-        sla: 'Langsung Timbang & Catat',
-        fee: 'Mendapat Poin Tabungan',
-        citation: {
-          title: 'Peraturan Pekon Margodadi No. 05/2023 tentang Pengelolaan Sampah Mandiri',
-          relevance: '97%',
-          similarity: 'Cosine Similarity 0.975',
-          quote:
-            '“Setiap rumah tangga didorong memilah sampah dari sumbernya untuk mendukung target Margodadi Bebas Sampah Liar 2026.”',
-        },
-        actions: [
-          { label: 'Pelajari Edukasi Sampah', link: '/edukasi-sampah', icon: 'recycling' },
-        ],
-      }
-    } else if (q.includes('ktp') || q.includes('identitas') || q.includes('perekaman') || q.includes('nik')) {
-      reply.text =
-        'Untuk pengurusan **e-KTP (Perekaman Baru / Penggantian Rusak / Hilang)**, Pekon Margodadi menerbitkan surat pengantar resmi ke Disdukcapil / Kantor Camat Ambarawa.'
-      reply.richContent = {
-        checkpoints: [
-          'Fotokopi Kartu Keluarga (KK) terbaru',
-          'Surat Pengantar dari RT domisili',
-          'KTP lama (jika rusak) atau Surat Kehilangan Polsek (jika hilang)',
-          'Usia minimal 17 tahun bagi perekaman pemula',
-        ],
-        sla: 'Surat Pengantar Terbit Seketika (±10 Menit)',
-        fee: 'GRATIS (Rp 0,-)',
-        citation: {
-          title: 'SOP Kependudukan Disdukcapil Kab. Pringsewu & Pekon Margodadi',
-          relevance: '96%',
-          similarity: 'Cosine Similarity 0.968',
-          quote:
-            '“Surat Pengantar Perekaman KTP-el diterbitkan gratis di loket Kasi Pemerintahan pada hari kerja.”',
-        },
-        actions: [{ label: 'Buka Halaman Layanan', link: '/layanan-publik', icon: 'badge' }],
-      }
-    } else if (q.includes('kopi') || q.includes('bambu') || q.includes('keripik') || q.includes('madu') || q.includes('batik') || q.includes('bibit') || q.includes('umkm')) {
-      reply.text =
-        'Pekon Margodadi memiliki berbagai produk unggulan UMKM binaan warga lokal, antara lain Kopi Robusta Lereng, Anyaman Bambu Lestari, Keripik Pisang Barokah Rasa, Madu Hutan Sari Lebah, Batik Tulis Kopi & Lada, serta Pembibitan Tanaman Tani Makmur.'
-      reply.richContent = {
-        checkpoints: [
-          'Katalog digital terverifikasi pekon',
-          'Dapat dihubungi langsung via WhatsApp pengrajin/penjual',
-          'Tersedia layanan kemasan cinderamata dan oleh-oleh khas desa',
-        ],
-        sla: 'Informasi Real-Time',
-        fee: 'Harga Langsung dari Pengrajin',
-        actions: [{ label: 'Lihat Direktori UMKM', link: '/potensi-umkm', icon: 'storefront' }],
-      }
-    } else if (q.includes('operator') || q.includes('manusia') || q.includes('petugas') || q.includes('kadus') || q.includes('lurah') || q.includes('bantuan')) {
-      reply.sender = 'operator'
-      reply.operatorName = 'Dewi Lestari'
-      reply.operatorRole = 'Kasi Pelayanan Pekon'
-      reply.operatorAvatar =
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuCJiUP4EFFyg8VmjNLkwguRcXBjHsTg2Olj4mZ1siG7OraQdbZeP3aQwyjsFgIniDHuZbZ2obeUOt1VGMVYvAkw6RL938E_ITdYilQUixmB87yUPJan6gDJ8yU6ts9Yl6Fvk1MJaS4PFMyJ5zHMIpur7IAzzepXzed2D_jTV9B3KBewWmhCGQDQ3SUahhSze9_twdBPmGFXqpTYJSV0Jto8tAF22ainVvZiuUW81ZhoiX1WJTAw0r0'
-      reply.text =
-        'Halo Bapak/Ibu, saya petugas piket Kasi Pelayanan Pekon Margodadi. Kami siap membantu konsultasi berkas khusus atau kendala administrasi Anda. Anda juga dapat datang langsung ke Balai Pekon Margodadi (Senin–Kamis: 08.00–16.00 WIB, Jumat: 08.00–16.30 WIB).'
-    } else {
-      reply.text = `Terima kasih atas pertanyaannya. Menanggapi: "${query}", sistem RAG Pekon Margodadi mencatat bahwa seluruh layanan pengurusan berkas administrasi dan informasi potensi pekon dapat dikonsultasikan setiap hari kerja di Balai Pekon Margodadi.`
-      reply.richContent = {
-        checkpoints: [
-          'Loket Buka: Senin–Kamis (08.00–16.00 WIB), Jumat (08.00–16.30 WIB)',
-          'Pelayanan administrasi 100% Bebas Pungli & Bebas Biaya Retribusi',
-          'Membawa KTP asli & Kartu Keluarga untuk verifikasi identitas',
-        ],
-        sla: 'Respons Cepat',
-        fee: 'GRATIS (Rp 0,-)',
-        actions: [
-          { label: 'Daftar Layanan Publik', link: '/layanan-publik', icon: 'description' },
-        ],
-      }
-    }
-
-    setMessages((prev) => [...prev, reply])
-  }
-
-  const triggerHandoverNotice = () => {
-    const now = new Date()
-    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} WIB`
-
-    const handoverNotice = {
-      id: getNextId('handover'),
-      sender: 'system',
-      text: 'Permintaan eskalasi terkirim. Petugas piket Pelayanan Pekon Margodadi telah menerima notifikasi dan tersambung langsung dalam sesi konsultasi ini.',
-      timestamp: currentTime,
-    }
-
-    const operatorMsg = {
-      id: getNextId('op'),
-      sender: 'operator',
-      operatorName: 'Dewi Lestari',
-      operatorRole: 'Kasi Pelayanan Pekon',
-      operatorAvatar:
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuCJiUP4EFFyg8VmjNLkwguRcXBjHsTg2Olj4mZ1siG7OraQdbZeP3aQwyjsFgIniDHuZbZ2obeUOt1VGMVYvAkw6RL938E_ITdYilQUixmB87yUPJan6gDJ8yU6ts9Yl6Fvk1MJaS4PFMyJ5zHMIpur7IAzzepXzed2D_jTV9B3KBewWmhCGQDQ3SUahhSze9_twdBPmGFXqpTYJSV0Jto8tAF22ainVvZiuUW81ZhoiX1WJTAw0r0',
-      text: 'Selamat pagi/siang Bapak/Ibu! Saya Dewi Lestari dari Kasi Pelayanan Pekon Margodadi. Ada kebutuhan berkas khusus atau asistensi tatap muka yang dapat kami bantu proseskan hari ini?',
-      timestamp: currentTime,
-    }
-
-    setMessages((prev) => [...prev, handoverNotice, operatorMsg])
-    showToast('Tersambung dengan Petugas Aparatur Pekon.')
+  const triggerHandoverNotice = async () => {
+    handleSend('Saya butuh bantuan langsung atau berbicara dengan operator aparatur pekon.')
+    showToast('Menghubungkan ke Aparatur Pekon...')
   }
 
   const clearDialogue = () => {
     if (window.confirm('Bersihkan riwayat percakapan saat ini dan mulai sesi baru?')) {
       const now = new Date()
       const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} WIB`
+      const freshSessionId = `SESS-${Math.random().toString(36).substring(2, 10).toUpperCase()}`
+      setSessionId(freshSessionId)
+      localStorage.setItem('vg_public_session', freshSessionId)
+
       setMessages([
         {
           id: getNextId('fresh'),
@@ -305,13 +204,22 @@ export default function TanyaVirtualGuidePage() {
     }
   }
 
-  const handleFeedback = (msgId, type) => {
+  const handleFeedback = async (msgId, type) => {
     setFeedbackGiven((prev) => ({ ...prev, [msgId]: type }))
-    showToast(
-      type === 'up'
-        ? 'Terima kasih atas ulasan positif Anda!'
-        : 'Umpan balik dicatat untuk penyempurnaan akurasi RAG.'
-    )
+    try {
+      await chatbotService.submitFeedback({
+        conversation_id: conversationId,
+        rating: type === 'up' ? 5 : 2,
+        comment: type === 'up' ? 'Ulasan positif warga: informasi membantu.' : 'Ulasan warga: perlu penyempurnaan.',
+      })
+      showToast(
+        type === 'up'
+          ? 'Terima kasih atas ulasan positif Anda!'
+          : 'Umpan balik dicatat untuk penyempurnaan akurasi RAG.'
+      )
+    } catch (err) {
+      console.warn('Failed to submit feedback:', err)
+    }
   }
 
   const toggleVoiceInput = () => {

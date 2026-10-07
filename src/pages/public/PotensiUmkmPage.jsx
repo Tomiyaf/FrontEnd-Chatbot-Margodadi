@@ -1,296 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-
-const umkmData = [
-  {
-    id: 'kopi-supardi',
-    name: 'Kopi Robusta Lereng Margodadi',
-    subTitle: 'Usaha Pengolahan Kopi Rakyat Berkelanjutan Sejak 2017',
-    regNumber: 'MKD-UMKM-001',
-    category: ['pertanian', 'kuliner'],
-    categoryBadge: 'Pertanian & Kuliner',
-    owner: 'Bapak Supardi',
-    phone: '0812-7890-1234',
-    waNumber: '6281278901234',
-    address: 'Dusun 02 RT 04, Pekon Margodadi',
-    description:
-      'Biji kopi robusta petik merah asli lereng perkebunan Margodadi, diproses natural dan honey process dengan aroma cokelat karamel khas pegunungan Tanggamus.',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDvgNR0og9Y-3RyovTKv9qZJqGfZ3iHvvTo4DycV3xkmNfOdqokFqco3tSlqfRtExPG2Lq30TEYCe0jy3AEE8HzMgw-E2z-Pso3Q2fn4Wy_WNurNc3r5CCpVfYa5v_ypkYE3oPq3gOaizZfVS8AVgabm3zoZyDDgfJX-xC2wI771ciBw3JBxhG4fz_s5uJgb0-FJjoKF1l_xDYdj2QfkBp1_arMGQYRZgROBMK0vpHh4AyL8ITsVLE',
-    featuredProducts: [
-      { name: 'Kopi Bubuk 250gr', price: 'Rp 35.000' },
-      { name: 'Roasted Beans 500gr', price: 'Rp 65.000' },
-      { name: 'Green Bean Grade 1 1kg', price: 'Rp 85.000' },
-    ],
-    history:
-      "Berawal dari tradisi turun-temurun mengelola kebun kopi seluas 2,5 hektar di lereng perbukitan Tanggamus, Bapak Supardi merintis 'Kopi Robusta Lereng Margodadi' guna memutus ketergantungan tengkulak mentah. Dengan menerapkan sistem petik merah selektif 100%, biji kopi dijemur di atas raised bed berventilasi untuk menghasilkan rasa manis alami (honey note) yang tebal dan aftertaste cokelat murni tanpa cacat rasa.",
-    legalCertification: 'P-IRT Dinas Kesehatan',
-    legalNumber: 'No. 2101806010042-26',
-    capacity: '400 kg/bln',
-    capacityNote: 'Petik Merah Optimal',
-    group: 'Gapoktan Pekon',
-    groupLocation: 'Sumberejo, Tanggamus',
-    gallery: [
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuB9WqiAEU2zS254PJ3sD6IFlayETpaX1n7QRhEgYbK0-ZkYl_zZJPS3r30nXee8I7bogwxUpQwDmGb7Bi3M4K8vhR-wpkdnuph9BVCedZJmD7BfKRKDRQi_C5lj8V1FL9GAqIYtpwF3njqT9yMo2yygizaQYvMYjgbhSdalGQo42pNAAXUUbAFXOdErGUqL0VkQy6fNP4baL2Q7RwmG0MUpPLDYWXFPk_ErxFfFfcxEMdtZ-YvFoVk',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDhdw3VbnsfX2tjyMXCpDPiUJOzz8-sMCp8Tlg_Lvu9f2J5giipVSdsln2mnejpj-VKZmOv-4tuXxpm0Hy-ToohNvNHHo0AmF8Xj9egnae1eBmYuC6-WmVdJaXTYrq5Uua3afIWO16sZzU21AK8NS7VIGBoQm6cUp9HSRJCDeVt2UIYlGX3WGhlcZL9TpK-WZG4U8FeteSYmLfXc2TH2kEnPYUC6Ywx85XnZn30KBwIqvgSrXAaNhs',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBQ6EidJ3qiF1gOITZ81MJLN8WfvzIX8geN4PNXZfB9RDmZtSsplFy0VbPa1n1fMw53twBqBShp-5Mkoz2AMFauI70wWpBOv4povv1AzqDhJaszD8SDVRx5xJI2R8-QyC46a3DOlQjWQ4ZKUOon20Z_shfccUeyOcUK-30unqhSNwqdUnDcITKIq4uYXTBZz-CIwGMWcbJ9wuqhe5H05IAhZrjEEMwfmGbIYL4KF2i_QDONn4nS_LA',
-    ],
-    mapTitle: 'Rumah Produksi Kopi Pak Supardi',
-    mapAddress: 'Dusun 02 RT 04, Margodadi',
-    mapImage:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCggn7q2y8c6oRj7jcGM3liyMwvg6rl8Rmgl8r0P3ZIWvod2SyCMlwA_V-sjLGihtbeGcbTtV1AeTOamn9bRSN5sHVxG2M-EFqEylBB-ub68O0Ah8If55vX0v-bzPN09BTSp0ruIhgtpM23E1JBnsZ4V4Uh6unHo90gdotMMlrLjTq0c4Q-_J5iDLz8hus7bwgIsLcUPd_ldhoBQnTS7h5ml3nFWnHaWZ27NxIFPRf9K3SfGecPD3I',
-    mapUrl: 'https://maps.google.com/?q=Margodadi+Sumberejo+Tanggamus',
-    lastVerified: '12 Januari 2025',
-  },
-  {
-    id: 'anyaman-lestari',
-    name: 'Anyaman Bambu Lestari',
-    subTitle: 'Sentra Kerajinan Ramah Lingkungan & Pemberdayaan Perempuan',
-    regNumber: 'MKD-UMKM-002',
-    category: ['kerajinan'],
-    categoryBadge: 'Kerajinan & Kriya',
-    owner: 'Ibu Sri Utami',
-    phone: '0853-2211-4321',
-    waNumber: '6285322114321',
-    address: 'Dusun 01 RT 02, Pekon Margodadi',
-    description:
-      'Produk kerajinan tangan ramah lingkungan dari bambu apus lokal. Halus, tahan rayap, dan cocok untuk cinderamata hajatan serta suvenir khas desa.',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuD68MzkIwpsjk6UuMIY8PZXKmHatTFVp0ws1f2qKgYeWTmmkQfIJFf1ZiPoBTlr0yW5cphvKztaMsTdz4md7CpMZW0znmCOLranNCnsjDe7VNyyD73sbjw72IPRb-_Qypu6H0Le3kVIJZzbnbb_AeUFkPoY4hs058jvfHQrehfQ7t4-g4cP_53VLF1qOzIPrcFugYvnwglZ4nLtv2Ukb5OPPXyHPV5Fsu83ISw0dKwv-MbhzAL97Xw',
-    featuredProducts: [
-      { name: 'Besek Bambu', price: 'Rp 8.000' },
-      { name: 'Tudung Saji Etnik', price: 'Rp 45.000' },
-      { name: 'Tas Anyam', price: 'Rp 30.000' },
-    ],
-    history:
-      'Kelompok pengrajin anyaman bambu yang dibina untuk memberdayakan ibu-ibu rumah tangga Dusun 01 Pekon Margodadi. Memanfaatkan rumpun bambu apus lokal dengan proses pengawetan tradisional asap alami tanpa bahan kimia berbahaya sehingga ramah lingkungan dan tahan lama puluhan tahun.',
-    legalCertification: 'SKU & NIB Terdaftar',
-    legalNumber: 'No. NIB-0819230018821',
-    capacity: '300 pcs/bln',
-    capacityNote: 'Anyaman Halus Handmade',
-    group: 'KWT Anyam Lestari',
-    groupLocation: 'Dusun 01, Margodadi',
-    gallery: [
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuD68MzkIwpsjk6UuMIY8PZXKmHatTFVp0ws1f2qKgYeWTmmkQfIJFf1ZiPoBTlr0yW5cphvKztaMsTdz4md7CpMZW0znmCOLranNCnsjDe7VNyyD73sbjw72IPRb-_Qypu6H0Le3kVIJZzbnbb_AeUFkPoY4hs058jvfHQrehfQ7t4-g4cP_53VLF1qOzIPrcFugYvnwglZ4nLtv2Ukb5OPPXyHPV5Fsu83ISw0dKwv-MbhzAL97Xw',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCc4ChZXPKMb8wcwRXMZYqTwUvOqunj4WKT87DmofCm8iluO7NtLme6d4UN4pIrm0C4ut25hfreJflFdO-BsQyrZjHsMgwInwqxkTzCt4nGVJKBB3WtV4IBPyXIF17rPAIp1Y_9W1teYjlr_Gw21WObIrxF-3na-R-OAX058ITD_6SprbUQL9swoqgp3WbczTVBiJrgEWKXOak5VCcuCItLAFJEtY3WgPyhS-5helc3SBewxC6dKiA',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDLin53tuR6zxbtcY2W4MKlK2qiI0WDTU5ZklX2fiDsWm6VwgSn4Lm1NVt3BGTmbO9fgt6vytiFvng4SM4v44fcH4Yw0sgXzcYoLXfDw0O-rzoaCYBCFFqLq2Y_hLklYUvbwLe43oG3anKbbiA7ganKdP4H_LugqUoxRyrsfrFGcBLkwTmiXt5tNXyNAzIVeurULL2z7ziHq08bw8ucURqZdRbRFRT6XKLmEyBU4xpFYMxuiQT_PMg',
-    ],
-    mapTitle: 'Workshop Kriya Anyaman Bambu Lestari',
-    mapAddress: 'Dusun 01 RT 02, Margodadi',
-    mapImage:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCggn7q2y8c6oRj7jcGM3liyMwvg6rl8Rmgl8r0P3ZIWvod2SyCMlwA_V-sjLGihtbeGcbTtV1AeTOamn9bRSN5sHVxG2M-EFqEylBB-ub68O0Ah8If55vX0v-bzPN09BTSp0ruIhgtpM23E1JBnsZ4V4Uh6unHo90gdotMMlrLjTq0c4Q-_J5iDLz8hus7bwgIsLcUPd_ldhoBQnTS7h5ml3nFWnHaWZ27NxIFPRf9K3SfGecPD3I',
-    mapUrl: 'https://maps.google.com/?q=Margodadi+Sumberejo+Tanggamus',
-    lastVerified: '15 Januari 2025',
-  },
-  {
-    id: 'keripik-barokah',
-    name: 'Keripik Pisang Tanduk "Barokah Rasa"',
-    subTitle: 'Oleh-oleh Gurih & Manis Renyah Khas Perkebunan Margodadi',
-    regNumber: 'MKD-UMKM-003',
-    category: ['kuliner'],
-    categoryBadge: 'Kuliner & Olahan',
-    owner: 'Ibu Siti Rahayu',
-    phone: '0821-9988-7766',
-    waNumber: '6282199887766',
-    address: 'Dusun 03 RT 06, Pekon Margodadi',
-    description:
-      'Oleh-oleh khas Lampung dari pisang tanduk kebun petani binaan. Renyah tanpa pengawet dengan baluran cokelat pekat dan racikan bumbu gurih.',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDLin53tuR6zxbtcY2W4MKlK2qiI0WDTU5ZklX2fiDsWm6VwgSn4Lm1NVt3BGTmbO9fgt6vytiFvng4SM4v44fcH4Yw0sgXzcYoLXfDw0O-rzoaCYBCFFqLq2Y_hLklYUvbwLe43oG3anKbbiA7ganKdP4H_LugqUoxRyrsfrFGcBLkwTmiXt5tNXyNAzIVeurULL2z7ziHq08bw8ucURqZdRbRFRT6XKLmEyBU4xpFYMxuiQT_PMg',
-    featuredProducts: [
-      { name: 'Cokelat Lumer 200g', price: 'Rp 18.000' },
-      { name: 'Manis Gurih 200g', price: 'Rp 15.000' },
-      { name: 'Balado Pedas Manis 200g', price: 'Rp 16.000' },
-    ],
-    history:
-      'Mengolah komoditas pisang tanduk lokal yang melimpah di kebun pekon menjadi aneka camilan bernilai tambah tinggi. Melalui proses penggorengan minyak kelapa berkualitas dan pengeringan sentrifugal (spinner), keripik tetap renyah hingga 6 bulan tanpa bahan kimia pengawet.',
-    legalCertification: 'P-IRT & Halal Kemenag',
-    legalNumber: 'ID18110002981023',
-    capacity: '600 pouch/bln',
-    capacityNote: 'Kemasan Zipper Stand Pouch',
-    group: 'Koperasi Warga Margodadi',
-    groupLocation: 'Dusun 03, Margodadi',
-    gallery: [
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDLin53tuR6zxbtcY2W4MKlK2qiI0WDTU5ZklX2fiDsWm6VwgSn4Lm1NVt3BGTmbO9fgt6vytiFvng4SM4v44fcH4Yw0sgXzcYoLXfDw0O-rzoaCYBCFFqLq2Y_hLklYUvbwLe43oG3anKbbiA7ganKdP4H_LugqUoxRyrsfrFGcBLkwTmiXt5tNXyNAzIVeurULL2z7ziHq08bw8ucURqZdRbRFRT6XKLmEyBU4xpFYMxuiQT_PMg',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDvgNR0og9Y-3RyovTKv9qZJqGfZ3iHvvTo4DycV3xkmNfOdqokFqco3tSlqfRtExPG2Lq30TEYCe0jy3AEE8HzMgw-E2z-Pso3Q2fn4Wy_WNurNc3r5CCpVfYa5v_ypkYE3oPq3gOaizZfVS8AVgabm3zoZyDDgfJX-xC2wI771ciBw3JBxhG4fz_s5uJgb0-FJjoKF1l_xDYdj2QfkBp1_arMGQYRZgROBMK0vpHh4AyL8ITsVLE',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDTQhtOTsN8KebCjuFXt0TbyojwdrzZBMXeIZU0UXc6puQdNaPdXKfp0QQcc6uMJ6lQvpPqHWQyYk1VNn2vS2L7CPuDMwxj3EPj02bbXQuO4DwYqd6-qiuW5y89QmDSRdr1eI54w9bnsj0jR0MO9HKU_4OlfjO2rJ94Bg5O_0sNGrwtLx6fuFxMshshiP-febbV1MdnewvF4atJI3ebJE0aPFIJZL6ca6L-iMvtHsQfbGc_SWuQIok',
-    ],
-    mapTitle: 'Dapur Produksi Barokah Rasa',
-    mapAddress: 'Dusun 03 RT 06, Margodadi',
-    mapImage:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCggn7q2y8c6oRj7jcGM3liyMwvg6rl8Rmgl8r0P3ZIWvod2SyCMlwA_V-sjLGihtbeGcbTtV1AeTOamn9bRSN5sHVxG2M-EFqEylBB-ub68O0Ah8If55vX0v-bzPN09BTSp0ruIhgtpM23E1JBnsZ4V4Uh6unHo90gdotMMlrLjTq0c4Q-_J5iDLz8hus7bwgIsLcUPd_ldhoBQnTS7h5ml3nFWnHaWZ27NxIFPRf9K3SfGecPD3I',
-    mapUrl: 'https://maps.google.com/?q=Margodadi+Sumberejo+Tanggamus',
-    lastVerified: '10 Februari 2025',
-  },
-  {
-    id: 'madu-sari-lebah',
-    name: 'Madu Alami Hutan "Sari Lebah"',
-    subTitle: 'Madu Hutan Liar Murni & Klanceng Trigona Bebas Campuran',
-    regNumber: 'MKD-UMKM-004',
-    category: ['pertanian', 'kuliner'],
-    categoryBadge: 'Pertanian & Agribisnis',
-    owner: 'Kang Asep Sunandar',
-    phone: '0813-4455-8899',
-    waNumber: '6281344558899',
-    address: 'Dusun 04 RT 08, Pekon Margodadi',
-    description:
-      'Madu murni lebah liar (Apis dorsata) dan klanceng dari vegetasi pohon perkebunan Margodadi. Alami tanpa pasteurisasi dan kaya enzim alami.',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDTQhtOTsN8KebCjuFXt0TbyojwdrzZBMXeIZU0UXc6puQdNaPdXKfp0QQcc6uMJ6lQvpPqHWQyYk1VNn2vS2L7CPuDMwxj3EPj02bbXQuO4DwYqd6-qiuW5y89QmDSRdr1eI54w9bnsj0jR0MO9HKU_4OlfjO2rJ94Bg5O_0sNGrwtLx6fuFxMshshiP-febbV1MdnewvF4atJI3ebJE0aPFIJZL6ca6L-iMvtHsQfbGc_SWuQIok',
-    featuredProducts: [
-      { name: 'Madu Hutan 350ml', price: 'Rp 85.000' },
-      { name: 'Madu Klanceng 250ml', price: 'Rp 95.000' },
-      { name: 'Sarang Madu Sisir 250g', price: 'Rp 70.000' },
-    ],
-    history:
-      'Budidaya lebah klanceng (Trigona sp.) dan pemanenan lestari madu lebah liar lereng pekon dengan memperhatikan siklus nektar bunga kopi dan randu. Menjamin kadar air alami di bawah 20% tanpa proses pemanasan kimiawi sehingga kandungan propolis dan antioksidan tetap utuh.',
-    legalCertification: 'Uji Lab & NIB Pertanian',
-    legalNumber: 'No. NIB-1102948192837',
-    capacity: '150 botol/bln',
-    capacityNote: 'Panen Alami Bersiklus',
-    group: 'Komunitas Peternak Lebah Pekon',
-    groupLocation: 'Dusun 04, Margodadi',
-    gallery: [
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDTQhtOTsN8KebCjuFXt0TbyojwdrzZBMXeIZU0UXc6puQdNaPdXKfp0QQcc6uMJ6lQvpPqHWQyYk1VNn2vS2L7CPuDMwxj3EPj02bbXQuO4DwYqd6-qiuW5y89QmDSRdr1eI54w9bnsj0jR0MO9HKU_4OlfjO2rJ94Bg5O_0sNGrwtLx6fuFxMshshiP-febbV1MdnewvF4atJI3ebJE0aPFIJZL6ca6L-iMvtHsQfbGc_SWuQIok',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuB0XhG5qjdBzpJJ9CswTyzm_0oB7kgIS6ISuG58SQDZXdhqSJXwH3juSybJKg60yUnEyoPJb_P_E4zyxGyyZXFOHHiaC_TPSr3Q-u-xNYLwP0ed4qrvIjvF6l-PVqbs6hM3-GSeux1SmKRRekoc-VYAI_pGzwcFVuABbEIk6XARYnFDbSjIT6s7F3e9k6xTS3a6ezJqPiGUWeMAcwJW_N4Y1s04GOnZ4KcIbLGaZHD_4h9-JCq3dXg',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDvgNR0og9Y-3RyovTKv9qZJqGfZ3iHvvTo4DycV3xkmNfOdqokFqco3tSlqfRtExPG2Lq30TEYCe0jy3AEE8HzMgw-E2z-Pso3Q2fn4Wy_WNurNc3r5CCpVfYa5v_ypkYE3oPq3gOaizZfVS8AVgabm3zoZyDDgfJX-xC2wI771ciBw3JBxhG4fz_s5uJgb0-FJjoKF1l_xDYdj2QfkBp1_arMGQYRZgROBMK0vpHh4AyL8ITsVLE',
-    ],
-    mapTitle: 'Peternakan & Koloni Lebah Sari Lebah',
-    mapAddress: 'Dusun 04 RT 08, Margodadi',
-    mapImage:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCggn7q2y8c6oRj7jcGM3liyMwvg6rl8Rmgl8r0P3ZIWvod2SyCMlwA_V-sjLGihtbeGcbTtV1AeTOamn9bRSN5sHVxG2M-EFqEylBB-ub68O0Ah8If55vX0v-bzPN09BTSp0ruIhgtpM23E1JBnsZ4V4Uh6unHo90gdotMMlrLjTq0c4Q-_J5iDLz8hus7bwgIsLcUPd_ldhoBQnTS7h5ml3nFWnHaWZ27NxIFPRf9K3SfGecPD3I',
-    mapUrl: 'https://maps.google.com/?q=Margodadi+Sumberejo+Tanggamus',
-    lastVerified: '18 Januari 2025',
-  },
-  {
-    id: 'batik-margodadi',
-    name: 'Batik Tulis Kopi & Lada',
-    subTitle: 'Kain Etnik Kontemporer Pewarna Alami & Corak Agrikultur',
-    regNumber: 'MKD-UMKM-005',
-    category: ['kerajinan'],
-    categoryBadge: 'Kerajinan & Kriya',
-    owner: 'Paguyuban Putri Margodadi',
-    phone: '0852-7311-6655',
-    waNumber: '6285273116655',
-    address: 'Balai Kreatif Dusun 01, Pekon Margodadi',
-    description:
-      'Kain batik tulis kontemporer dengan motif khas kekayaan bumi Sumberejo seperti biji kopi dan tangkai lada hitam berpadu ornamen tapis tradisional.',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCc4ChZXPKMb8wcwRXMZYqTwUvOqunj4WKT87DmofCm8iluO7NtLme6d4UN4pIrm0C4ut25hfreJflFdO-BsQyrZjHsMgwInwqxkTzCt4nGVJKBB3WtV4IBPyXIF17rPAIp1Y_9W1teYjlr_Gw21WObIrxF-3na-R-OAX058ITD_6SprbUQL9swoqgp3WbczTVBiJrgEWKXOak5VCcuCItLAFJEtY3WgPyhS-5helc3SBewxC6dKiA',
-    featuredProducts: [
-      { name: 'Kain Panjang 2.2m', price: 'Rp 175.000' },
-      { name: 'Syal Batik Sutra', price: 'Rp 65.000' },
-      { name: 'Kemeja Batik Pria Siap Pakai', price: 'Rp 220.000' },
-    ],
-    history:
-      'Inisiatif pemberdayaan sanggar kreasi perempuan pekon Margodadi untuk mengangkat identitas agraris setempat melalui seni canting batik. Pewarnaan menggunakan ekstrak kulit pohon mahoni, daun mangga, dan serbuk limbah kopi pekon yang ramah alam.',
-    legalCertification: 'Hak Cipta Motif Kemenkumham',
-    legalNumber: 'No. HKI-EC00202419082',
-    capacity: '80 lembar/bln',
-    capacityNote: 'Batik Tulis & Cap Eksklusif',
-    group: 'Paguyuban Kreatif Putri Pekon',
-    groupLocation: 'Dusun 01, Margodadi',
-    gallery: [
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCc4ChZXPKMb8wcwRXMZYqTwUvOqunj4WKT87DmofCm8iluO7NtLme6d4UN4pIrm0C4ut25hfreJflFdO-BsQyrZjHsMgwInwqxkTzCt4nGVJKBB3WtV4IBPyXIF17rPAIp1Y_9W1teYjlr_Gw21WObIrxF-3na-R-OAX058ITD_6SprbUQL9swoqgp3WbczTVBiJrgEWKXOak5VCcuCItLAFJEtY3WgPyhS-5helc3SBewxC6dKiA',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuD68MzkIwpsjk6UuMIY8PZXKmHatTFVp0ws1f2qKgYeWTmmkQfIJFf1ZiPoBTlr0yW5cphvKztaMsTdz4md7CpMZW0znmCOLranNCnsjDe7VNyyD73sbjw72IPRb-_Qypu6H0Le3kVIJZzbnbb_AeUFkPoY4hs058jvfHQrehfQ7t4-g4cP_53VLF1qOzIPrcFugYvnwglZ4nLtv2Ukb5OPPXyHPV5Fsu83ISw0dKwv-MbhzAL97Xw',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuB0XhG5qjdBzpJJ9CswTyzm_0oB7kgIS6ISuG58SQDZXdhqSJXwH3juSybJKg60yUnEyoPJb_P_E4zyxGyyZXFOHHiaC_TPSr3Q-u-xNYLwP0ed4qrvIjvF6l-PVqbs6hM3-GSeux1SmKRRekoc-VYAI_pGzwcFVuABbEIk6XARYnFDbSjIT6s7F3e9k6xTS3a6ezJqPiGUWeMAcwJW_N4Y1s04GOnZ4KcIbLGaZHD_4h9-JCq3dXg',
-    ],
-    mapTitle: 'Balai Sanggar Batik Paguyuban Putri',
-    mapAddress: 'Balai Kreatif Dusun 01, Margodadi',
-    mapImage:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCggn7q2y8c6oRj7jcGM3liyMwvg6rl8Rmgl8r0P3ZIWvod2SyCMlwA_V-sjLGihtbeGcbTtV1AeTOamn9bRSN5sHVxG2M-EFqEylBB-ub68O0Ah8If55vX0v-bzPN09BTSp0ruIhgtpM23E1JBnsZ4V4Uh6unHo90gdotMMlrLjTq0c4Q-_J5iDLz8hus7bwgIsLcUPd_ldhoBQnTS7h5ml3nFWnHaWZ27NxIFPRf9K3SfGecPD3I',
-    mapUrl: 'https://maps.google.com/?q=Margodadi+Sumberejo+Tanggamus',
-    lastVerified: '20 Januari 2025',
-  },
-  {
-    id: 'bibit-tani-makmur',
-    name: 'Bibit Buah Unggul "Tani Makmur"',
-    subTitle: 'Nursery Okulasi Bibit Alpukat Aligator & Durian Unggulan',
-    regNumber: 'MKD-UMKM-006',
-    category: ['pertanian'],
-    categoryBadge: 'Pertanian & Agribisnis',
-    owner: 'Pak Joko Prayitno',
-    phone: '0823-1122-3344',
-    waNumber: '6282311223344',
-    address: 'Jalur Kebun Induk RT 05, Pekon Margodadi',
-    description:
-      'Pusat pembibitan vegetatif hasil okulasi bersertifikat. Menyediakan bibit alpukat aligator, durian bawor, dan mangga berbuah lebat cocok tanah lokal.',
-    image:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuB0XhG5qjdBzpJJ9CswTyzm_0oB7kgIS6ISuG58SQDZXdhqSJXwH3juSybJKg60yUnEyoPJb_P_E4zyxGyyZXFOHHiaC_TPSr3Q-u-xNYLwP0ed4qrvIjvF6l-PVqbs6hM3-GSeux1SmKRRekoc-VYAI_pGzwcFVuABbEIk6XARYnFDbSjIT6s7F3e9k6xTS3a6ezJqPiGUWeMAcwJW_N4Y1s04GOnZ4KcIbLGaZHD_4h9-JCq3dXg',
-    featuredProducts: [
-      { name: 'Bibit Alpukat Aligator', price: 'Rp 35.000' },
-      { name: 'Durian Bawor Okulasi', price: 'Rp 60.000' },
-      { name: 'Bibit Mangga Kiojay', price: 'Rp 40.000' },
-    ],
-    history:
-      'Pengembangan nursery tanaman buah tropis dengan teknik sambung pucuk dan okulasi mata tunas indukan unggul teruji. Memberikan garansi keaslian varietas dan konsultasi gratis pemupukan organik bagi para pekebun lokal maupun pehobi tanaman.',
-    legalCertification: 'Sertifikasi BPSB Tanaman Pangan',
-    legalNumber: 'No. BPSB-TPH/18/2024',
-    capacity: '2.500 bibit/bln',
-    capacityNote: 'Polybag Siap Tanam',
-    group: 'Kelompok Tani Makmur Margodadi',
-    groupLocation: 'Kebun Induk RT 05, Margodadi',
-    gallery: [
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuB0XhG5qjdBzpJJ9CswTyzm_0oB7kgIS6ISuG58SQDZXdhqSJXwH3juSybJKg60yUnEyoPJb_P_E4zyxGyyZXFOHHiaC_TPSr3Q-u-xNYLwP0ed4qrvIjvF6l-PVqbs6hM3-GSeux1SmKRRekoc-VYAI_pGzwcFVuABbEIk6XARYnFDbSjIT6s7F3e9k6xTS3a6ezJqPiGUWeMAcwJW_N4Y1s04GOnZ4KcIbLGaZHD_4h9-JCq3dXg',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDvgNR0og9Y-3RyovTKv9qZJqGfZ3iHvvTo4DycV3xkmNfOdqokFqco3tSlqfRtExPG2Lq30TEYCe0jy3AEE8HzMgw-E2z-Pso3Q2fn4Wy_WNurNc3r5CCpVfYa5v_ypkYE3oPq3gOaizZfVS8AVgabm3zoZyDDgfJX-xC2wI771ciBw3JBxhG4fz_s5uJgb0-FJjoKF1l_xDYdj2QfkBp1_arMGQYRZgROBMK0vpHh4AyL8ITsVLE',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuD68MzkIwpsjk6UuMIY8PZXKmHatTFVp0ws1f2qKgYeWTmmkQfIJFf1ZiPoBTlr0yW5cphvKztaMsTdz4md7CpMZW0znmCOLranNCnsjDe7VNyyD73sbjw72IPRb-_Qypu6H0Le3kVIJZzbnbb_AeUFkPoY4hs058jvfHQrehfQ7t4-g4cP_53VLF1qOzIPrcFugYvnwglZ4nLtv2Ukb5OPPXyHPV5Fsu83ISw0dKwv-MbhzAL97Xw',
-    ],
-    mapTitle: 'Nursery Kebun Bibit Tani Makmur',
-    mapAddress: 'Jalur Kebun Induk RT 05, Margodadi',
-    mapImage:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCggn7q2y8c6oRj7jcGM3liyMwvg6rl8Rmgl8r0P3ZIWvod2SyCMlwA_V-sjLGihtbeGcbTtV1AeTOamn9bRSN5sHVxG2M-EFqEylBB-ub68O0Ah8If55vX0v-bzPN09BTSp0ruIhgtpM23E1JBnsZ4V4Uh6unHo90gdotMMlrLjTq0c4Q-_J5iDLz8hus7bwgIsLcUPd_ldhoBQnTS7h5ml3nFWnHaWZ27NxIFPRf9K3SfGecPD3I',
-    mapUrl: 'https://maps.google.com/?q=Margodadi+Sumberejo+Tanggamus',
-    lastVerified: '25 Januari 2025',
-  },
-  {
-    id: 'bengkel-karya-mandiri',
-    name: 'Bengkel Las & Mesin Pertanian "Karya Mandiri"',
-    subTitle: 'Jasa Fabrikasi Alat Perkebunan, Pompa & Konstruksi Besi',
-    regNumber: 'MKD-UMKM-007',
-    category: ['jasa'],
-    categoryBadge: 'Jasa & Perdagangan',
-    owner: 'Mas Budi Santoso',
-    phone: '0812-6543-9876',
-    waNumber: '6281265439876',
-    address: 'Dusun 02 RT 03, Pekon Margodadi',
-    description:
-      'Jasa perbaikan dan perakitan mesin pertanian (traktor, mesin perontok padi, pompa air) serta pengerjaan kanopi dan pagar besi berkualitas kokoh.',
-    image:
-      'https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?auto=format&fit=crop&w=800&q=80',
-    featuredProducts: [
-      { name: 'Servis Mesin Pompa & Traktor', price: 'Mulai Rp 50.000' },
-      { name: 'Kanopi & Pagar Minimalis', price: 'Rp 275.000/m²' },
-      { name: 'Gerobak Angkut Sawit/Kopi', price: 'Rp 650.000' },
-    ],
-    history:
-      'Menyediakan jasa teknik terpadu untuk mendukung produktivitas para petani Pekon Margodadi. Memiliki peralatan las argon dan suku cadang mesin pertanian lengkap dengan jaminan pengerjaan rapi dan cepat.',
-    legalCertification: 'Surat Izin Usaha Perdagangan & Jasa',
-    legalNumber: 'No. SIUP-1982039120',
-    capacity: '30 proyek/bln',
-    capacityNote: 'Panggilan Lapangan & Workshop',
-    group: 'Asosiasi Usaha Bengkel Pekon',
-    groupLocation: 'Dusun 02, Margodadi',
-    gallery: [
-      'https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80',
-    ],
-    mapTitle: 'Bengkel Teknik Karya Mandiri',
-    mapAddress: 'Dusun 02 RT 03, Margodadi',
-    mapImage:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCggn7q2y8c6oRj7jcGM3liyMwvg6rl8Rmgl8r0P3ZIWvod2SyCMlwA_V-sjLGihtbeGcbTtV1AeTOamn9bRSN5sHVxG2M-EFqEylBB-ub68O0Ah8If55vX0v-bzPN09BTSp0ruIhgtpM23E1JBnsZ4V4Uh6unHo90gdotMMlrLjTq0c4Q-_J5iDLz8hus7bwgIsLcUPd_ldhoBQnTS7h5ml3nFWnHaWZ27NxIFPRf9K3SfGecPD3I',
-    mapUrl: 'https://maps.google.com/?q=Margodadi+Sumberejo+Tanggamus',
-    lastVerified: '28 Januari 2025',
-  },
-]
-
-const categories = [
-  { id: 'all', name: 'Semua Kategori' },
-  { id: 'kuliner', name: 'Kuliner & Olahan' },
-  { id: 'kerajinan', name: 'Kerajinan & Kriya' },
-  { id: 'pertanian', name: 'Pertanian & Agribisnis' },
-  { id: 'jasa', name: 'Jasa & Perdagangan' },
-]
+import publicService from '../../services/publicService'
 
 export default function PotensiUmkmPage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -299,6 +9,15 @@ export default function PotensiUmkmPage() {
   const [selectedProfileModal, setSelectedProfileModal] = useState(null)
   const [showManualModal, setShowManualModal] = useState(false)
   const [toastMessage, setToastMessage] = useState(null)
+  const [umkmList, setUmkmList] = useState([])
+  const [categories, setCategories] = useState([
+    { id: 'all', name: 'Semua Kategori', count: 7 },
+    { id: 'kuliner', name: 'Kuliner & Olahan', count: 3 },
+    { id: 'kerajinan', name: 'Kerajinan & Kriya', count: 2 },
+    { id: 'pertanian', name: 'Pertanian & Agribisnis', count: 3 },
+    { id: 'jasa', name: 'Jasa & Perdagangan', count: 1 },
+  ])
+  const [loading, setLoading] = useState(true)
 
   const showToast = (msg) => {
     setToastMessage(msg)
@@ -323,37 +42,40 @@ export default function PotensiUmkmPage() {
     }
   }, [selectedProfileModal, showManualModal])
 
-  // Filter Data
-  const filteredUmkm = umkmData.filter((item) => {
-    const query = searchQuery.trim().toLowerCase()
-    const matchesCategory =
-      selectedCategory === 'all' || item.category.includes(selectedCategory)
-    const matchesQuery =
-      !query ||
-      item.name.toLowerCase().includes(query) ||
-      item.owner.toLowerCase().includes(query) ||
-      item.description.toLowerCase().includes(query) ||
-      item.address.toLowerCase().includes(query) ||
-      item.featuredProducts.some((p) => p.name.toLowerCase().includes(query))
-
-    return matchesCategory && matchesQuery
-  })
-
-  // Sort Data
-  const sortedUmkm = [...filteredUmkm].sort((a, b) => {
-    if (sortBy === 'az') {
-      return a.name.localeCompare(b.name)
+  // Fetch UMKM from API
+  useEffect(() => {
+    let isMounted = true
+    const fetchUmkms = async () => {
+      setLoading(true)
+      try {
+        const res = await publicService.getUmkms({
+          search: searchQuery.trim() || undefined,
+          category: selectedCategory !== 'all' ? selectedCategory : undefined,
+          sort: sortBy,
+        })
+        if (isMounted && res?.data) {
+          if (res.data.umkms) setUmkmList(res.data.umkms)
+          if (res.data.categories) setCategories(res.data.categories)
+        }
+      } catch (err) {
+        console.error('Failed to load UMKM catalog:', err)
+      } finally {
+        if (isMounted) setLoading(false)
+      }
     }
-    if (sortBy === 'newest') {
-      return b.regNumber.localeCompare(a.regNumber)
-    }
-    return 0 // default 'popular' order
-  })
 
-  // Dynamic counts for category pills
+    const timer = setTimeout(fetchUmkms, 250)
+    return () => {
+      isMounted = false
+      clearTimeout(timer)
+    }
+  }, [searchQuery, selectedCategory, sortBy])
+
+  const sortedUmkm = umkmList
+
   const getCategoryCount = (catId) => {
-    if (catId === 'all') return umkmData.length
-    return umkmData.filter((item) => item.category.includes(catId)).length
+    const found = categories.find((c) => c.id === catId)
+    return found ? found.count : 0
   }
 
   return (

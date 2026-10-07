@@ -1,18 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import ScrollToTop from '../components/ScrollToTop'
-import { initialOperators } from '../data/adminMockData'
 import { useAuth } from '../context/AuthContext'
+import conversationService from '../services/conversationService'
 
 export default function AdminLayout() {
   const { operator, logout } = useAuth()
   const currentRole = operator?.role || 'ADMIN'
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [hitlQueueCount, setHitlQueueCount] = useState(0)
   const location = useLocation()
   const navigate = useNavigate()
 
-  // Authenticated operator details with fallback
+  // Authenticated operator details from database
   const activeOperator = {
     id: operator?.operator_id ? `OP-${String(operator.operator_id).padStart(2, '0')}` : 'OP-01',
     name: operator?.name || 'Aparatur Desa',
@@ -25,12 +26,32 @@ export default function AdminLayout() {
         : 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80'),
   }
 
+  // Fetch real HITL counter from DB
+  useEffect(() => {
+    let isMounted = true
+    const fetchHitlCount = async () => {
+      try {
+        const res = await conversationService.getConversations({ status: 'NEED_HUMAN', per_page: 1 })
+        if (isMounted && res?.meta) {
+          setHitlQueueCount(res.meta.total || 0)
+        }
+      } catch (err) {
+        console.warn('Failed to load HITL queue count:', err)
+      }
+    }
+
+    fetchHitlCount()
+    const interval = setInterval(fetchHitlCount, 10000)
+    return () => {
+      isMounted = false
+      clearInterval(interval)
+    }
+  }, [])
+
   const handleLogout = async () => {
     await logout()
     navigate('/login')
   }
-
-  const hitlQueueCount = 3 // Dynamic mock counter
 
   const navigationItems = [
     {
@@ -150,39 +171,15 @@ export default function AdminLayout() {
           </button>
         </div>
 
-        {/* Role Switcher Demo Box */}
-        <div className="p-3.5 mx-3 mt-3 bg-slate-800/60 rounded-xl border border-slate-700/60">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-              <span className="material-symbols-outlined text-xs text-primary-fixed">tune</span>
-              Simulasi Role Akun
-            </span>
-            <span className="text-[10px] text-emerald-400 font-semibold">{currentRole}</span>
+        {/* Real Authenticated Role Info */}
+        <div className="p-3.5 mx-3 mt-3 bg-slate-800/60 rounded-xl border border-slate-700/60 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-sm text-primary">verified_user</span>
+            <span className="text-xs font-bold text-slate-200">{activeOperator.role === 'ADMIN' ? 'Administrator Pekon' : 'Operator Layanan'}</span>
           </div>
-          <div className="grid grid-cols-2 gap-1.5 p-0.5 bg-slate-900 rounded-lg">
-            <button
-              type="button"
-              onClick={() => setCurrentRole('ADMIN')}
-              className={`py-1 text-xs font-semibold rounded-md transition-all ${
-                currentRole === 'ADMIN'
-                  ? 'bg-primary text-white shadow-xs'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Admin Pekon
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentRole('OPERATOR')}
-              className={`py-1 text-xs font-semibold rounded-md transition-all ${
-                currentRole === 'OPERATOR'
-                  ? 'bg-primary text-white shadow-xs'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Operator
-            </button>
-          </div>
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">
+            Terautentikasi
+          </span>
         </div>
 
         {/* Navigation Links */}
@@ -304,94 +301,58 @@ export default function AdminLayout() {
                 title="Notifikasi Masuk"
               >
                 <span className="material-symbols-outlined text-xl">notifications</span>
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500"></span>
+                {hitlQueueCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500"></span>
+                )}
               </button>
 
               {notificationsOpen && (
                 <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-200 p-4 z-50 animate-in fade-in zoom-in-95">
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                     <span className="text-xs font-bold text-slate-800">Notifikasi Real-time</span>
-                    <span className="text-[10px] text-primary font-bold cursor-pointer hover:underline">
-                      Tandai Dibaca
+                    <span
+                      onClick={() => setNotificationsOpen(false)}
+                      className="text-[10px] text-primary font-bold cursor-pointer hover:underline"
+                    >
+                      Tutup
                     </span>
                   </div>
                   <div className="py-2 space-y-2.5 max-h-72 overflow-y-auto">
-                    <div
-                      onClick={() => {
-                        setNotificationsOpen(false)
-                        navigate('/admin/conversations/CV-00123')
-                      }}
-                      className="p-2.5 rounded-xl bg-rose-50/70 border border-rose-100 hover:bg-rose-100/60 transition-colors cursor-pointer"
-                    >
-                      <div className="flex items-start gap-2">
-                        <span className="material-symbols-outlined text-rose-600 text-base mt-0.5">
-                          warning
-                        </span>
-                        <div>
-                          <p className="text-xs font-bold text-rose-950">
-                            #CV-00123 butuh intervensi operator
-                          </p>
-                          <p className="text-[11px] text-rose-800 mt-0.5">
-                            Pertanyaan izin usaha di luar domisili Margodadi.
-                          </p>
-                          <span className="text-[10px] text-rose-500 mt-1 block">
-                            2 menit yang lalu · WhatsApp
+                    {hitlQueueCount > 0 ? (
+                      <div
+                        onClick={() => {
+                          setNotificationsOpen(false)
+                          navigate('/admin/conversations?status=NEED_HUMAN')
+                        }}
+                        className="p-2.5 rounded-xl bg-rose-50/80 border border-rose-100 hover:bg-rose-100/80 transition-colors cursor-pointer"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-rose-800">
+                            Eskalasi HITL Membutuhkan Respon
                           </span>
+                          <span className="text-[10px] text-rose-600 font-mono">Live</span>
                         </div>
+                        <p className="text-[11px] text-rose-700 mt-0.5">
+                          Terdapat {hitlQueueCount} tiket eskalasi warga yang memerlukan bantuan operator.
+                        </p>
                       </div>
-                    </div>
-
-                    <div
-                      onClick={() => {
-                        setNotificationsOpen(false)
-                        navigate('/admin/conversations/CV-00124')
-                      }}
-                      className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-colors cursor-pointer"
-                    >
-                      <div className="flex items-start gap-2">
-                        <span className="material-symbols-outlined text-sky-600 text-base mt-0.5">
-                          chat
-                        </span>
-                        <div>
-                          <p className="text-xs font-bold text-slate-900">
-                            Pesan baru di #CV-00124
-                          </p>
-                          <p className="text-[11px] text-slate-600 mt-0.5">
-                            Warga bertanya komoditas minyak jelantah Bank Sampah.
-                          </p>
-                          <span className="text-[10px] text-slate-400 mt-1 block">
-                            5 menit yang lalu · Website Portal
-                          </span>
-                        </div>
+                    ) : (
+                      <div className="py-6 text-center text-xs text-slate-400">
+                        Tidak ada notifikasi baru
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               )}
             </div>
-
-            {/* User Profile Pill */}
-            <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
-              <img
-                src={activeOperator.avatar}
-                alt={activeOperator.name}
-                className="w-8 h-8 rounded-full object-cover border border-slate-300"
-              />
-              <div className="hidden sm:block text-left">
-                <p className="text-xs font-bold text-slate-800 leading-tight">
-                  {activeOperator.name}
-                </p>
-                <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
-                  {currentRole}
-                </span>
-              </div>
-            </div>
           </div>
         </header>
 
-        {/* MAIN OUTLET CONTAINER */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-7xl w-full mx-auto">
-          <Outlet context={{ currentRole, activeOperator }} />
+        {/* DYNAMIC CHILD PAGE CONTENT */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto">
+            <Outlet context={{ activeOperator, hitlQueueCount }} />
+          </div>
         </main>
       </div>
     </div>

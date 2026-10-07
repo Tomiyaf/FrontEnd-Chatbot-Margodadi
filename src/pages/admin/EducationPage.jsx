@@ -1,29 +1,59 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import StatCard from '../../components/admin/StatCard'
 import StatusBadge from '../../components/admin/StatusBadge'
 import ChannelBadge from '../../components/admin/ChannelBadge'
 import DataTable from '../../components/admin/DataTable'
 import ExportModal from '../../components/admin/ExportModal'
-import { initialEducationSessions } from '../../data/adminMockData'
+import { educationService } from '../../services/educationService'
+import { researchService } from '../../services/researchService'
 
 export default function EducationPage() {
-  const [sessions, setSessions] = useState(initialEducationSessions)
+  const [sessions, setSessions] = useState([])
+  const [stats, setStats] = useState({
+    totalSessions: 0,
+    completedSessions: 0,
+    inProgressSessions: 0,
+    completionRate: 0,
+    popularTopic: 'Bank Sampah',
+    topicBreakdown: [],
+  })
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('ALL')
+  const [isLoading, setIsLoading] = useState(true)
   const [isExportOpen, setIsExportOpen] = useState(false)
+  const [exportMessage, setExportMessage] = useState(null)
 
-  const filteredSessions = sessions.filter((s) => {
-    if (statusFilter !== 'ALL' && s.status !== statusFilter) return false
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase()
-      return (
-        s.respondentCode.toLowerCase().includes(q) ||
-        s.topic.toLowerCase().includes(q)
-      )
+  const fetchEducationData = async () => {
+    try {
+      setIsLoading(true)
+      const res = await educationService.getSessions({
+        search: searchQuery,
+        status: statusFilter,
+      })
+      if (res.status === 'success' && res.data) {
+        setSessions(res.data.sessions || [])
+        if (res.data.stats) {
+          setStats(res.data.stats)
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load education data:', err)
+    } finally {
+      setIsLoading(false)
     }
-    return true
-  })
+  }
+
+  useEffect(() => {
+    fetchEducationData()
+  }, [statusFilter])
+
+  // Debounced search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchEducationData()
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
 
   const availableExportFields = [
     { key: 'respondentCode', label: 'Kode Responden Anonim' },
@@ -34,6 +64,20 @@ export default function EducationPage() {
     { key: 'startedAt', label: 'Waktu Mulai Sesi' },
     { key: 'completedAt', label: 'Waktu Selesai' },
   ]
+
+  const handleExport = async (params) => {
+    try {
+      await researchService.exportCsv({
+        period: 'ALL',
+        fields: params.fields || ['respondentCode', 'topic', 'interactionCount', 'status', 'startedAt'],
+      })
+      setExportMessage('Data sesi edukasi berhasil diekspor!')
+      setTimeout(() => setExportMessage(null), 4000)
+    } catch (err) {
+      console.error('Export failed:', err)
+      alert('Gagal mengekspor data: ' + (err.response?.data?.message || err.message))
+    }
+  }
 
   const columns = [
     {
@@ -120,11 +164,18 @@ export default function EducationPage() {
         </div>
       </div>
 
+      {exportMessage && (
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 px-4 py-3 rounded-2xl flex items-center gap-2 text-xs font-bold animate-in fade-in">
+          <span className="material-symbols-outlined text-emerald-600">check_circle</span>
+          <span>{exportMessage}</span>
+        </div>
+      )}
+
       {/* 4 StatCards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Total Sesi Edukasi"
-          value="320"
+          value={stats.totalSessions || sessions.length}
           subtitle="Partisipasi warga desa"
           icon="school"
           trend="+22.5% minggu ini"
@@ -132,29 +183,29 @@ export default function EducationPage() {
         />
         <StatCard
           title="Sesi Tuntas (Completed)"
-          value="267"
-          subtitle="83.4% kelulusan modul"
+          value={stats.completedSessions}
+          subtitle={`${stats.completionRate}% kelulusan modul`}
           icon="task_alt"
           trend="Tingkat pemahaman tinggi"
           trendType="positive"
         />
         <StatCard
           title="Sedang Berlangsung"
-          value="53"
+          value={stats.inProgressSessions}
           subtitle="Interaksi aktif"
           icon="hourglass_top"
           badge="Live"
         />
         <StatCard
           title="Topik Populer"
-          value="Bank Sampah"
+          value={stats.popularTopic}
           subtitle="Komoditas ekonomi 3R"
           icon="recycling"
-          badge="39% Sesi"
+          badge="Modul Unggulan"
         />
       </div>
 
-      {/* Breakdown 5 Topik Edukasi */}
+      {/* Breakdown Topik Edukasi */}
       <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs space-y-3">
         <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
           <span className="material-symbols-outlined text-primary">menu_book</span>
@@ -162,13 +213,16 @@ export default function EducationPage() {
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-1">
-          {[
-            { name: 'Pemilahan Sampah', count: 98, pct: '30.6%', color: 'border-emerald-200 bg-emerald-50/50' },
-            { name: 'Prinsip 3R Terapan', count: 82, pct: '25.6%', color: 'border-indigo-200 bg-indigo-50/50' },
-            { name: 'Bank Sampah Berkah', count: 68, pct: '21.3%', color: 'border-amber-200 bg-amber-50/50' },
-            { name: 'Bahaya Bakar Sampah', count: 42, pct: '13.1%', color: 'border-rose-200 bg-rose-50/50' },
-            { name: 'Komposting Sederhana', count: 30, pct: '9.4%', color: 'border-teal-200 bg-teal-50/50' },
-          ].map((topic, idx) => (
+          {(stats.topicBreakdown && stats.topicBreakdown.length > 0
+            ? stats.topicBreakdown
+            : [
+                { name: 'Pemilahan Sampah', count: 98, pct: '30.6%', color: 'border-emerald-200 bg-emerald-50/50' },
+                { name: 'Prinsip 3R Terapan', count: 82, pct: '25.6%', color: 'border-indigo-200 bg-indigo-50/50' },
+                { name: 'Bank Sampah Berkah', count: 68, pct: '21.3%', color: 'border-amber-200 bg-amber-50/50' },
+                { name: 'Bahaya Bakar Sampah', count: 42, pct: '13.1%', color: 'border-rose-200 bg-rose-50/50' },
+                { name: 'Komposting Sederhana', count: 30, pct: '9.4%', color: 'border-teal-200 bg-teal-50/50' },
+              ]
+          ).map((topic, idx) => (
             <div key={idx} className={`p-3.5 rounded-xl border ${topic.color} space-y-1`}>
               <span className="text-xs font-bold text-slate-800 block truncate">{topic.name}</span>
               <div className="flex justify-between items-baseline pt-1">
@@ -209,7 +263,16 @@ export default function EducationPage() {
           </div>
         </div>
 
-        <DataTable columns={columns} data={filteredSessions} />
+        {isLoading ? (
+          <div className="p-12 text-center bg-white rounded-2xl border border-slate-200">
+            <span className="material-symbols-outlined text-3xl text-primary animate-spin">
+              progress_activity
+            </span>
+            <p className="text-xs text-slate-500 mt-2">Memuat data sesi edukasi...</p>
+          </div>
+        ) : (
+          <DataTable columns={columns} data={sessions} />
+        )}
       </div>
 
       {/* Export Modal */}
@@ -219,9 +282,7 @@ export default function EducationPage() {
         title="Export Data Sesi Edukasi Sampah"
         description="Pilih parameter untuk mengunduh rekap sesi edukasi warga Margodadi."
         availableFields={availableExportFields}
-        onExport={(params) => {
-          alert(`Data berhasil diekspor dalam format ${params.format}!`)
-        }}
+        onExport={handleExport}
       />
     </div>
   )

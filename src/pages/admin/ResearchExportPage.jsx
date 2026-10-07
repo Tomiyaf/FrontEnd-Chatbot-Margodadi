@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import DataTable from '../../components/admin/DataTable'
 import StatusBadge from '../../components/admin/StatusBadge'
-import { initialEducationSessions } from '../../data/adminMockData'
+import { researchService } from '../../services/researchService'
 
 export default function ResearchExportPage() {
   const [dateRange, setDateRange] = useState('MONTH')
@@ -15,8 +15,29 @@ export default function ResearchExportPage() {
     materialVersion: true,
     startedAt: true,
   })
+  const [previewData, setPreviewData] = useState([])
+  const [isLoadingPreview, setIsLoadingPreview] = useState(true)
   const [isExporting, setIsExporting] = useState(false)
   const [downloadSuccess, setDownloadSuccess] = useState(false)
+  const [downloadedFileName, setDownloadedFileName] = useState('')
+
+  const fetchPreview = async () => {
+    try {
+      setIsLoadingPreview(true)
+      const res = await researchService.getPreview(dateRange)
+      if (res.status === 'success' && res.data) {
+        setPreviewData(res.data)
+      }
+    } catch (err) {
+      console.error('Failed to load preview:', err)
+    } finally {
+      setIsLoadingPreview(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchPreview()
+  }, [dateRange])
 
   const fieldsList = [
     { key: 'respondentCode', label: 'Kode Responden Anonim (RESP-xxx)' },
@@ -33,13 +54,30 @@ export default function ResearchExportPage() {
     setSelectedFields((prev) => ({ ...prev, [key]: !prev[key] }))
   }
 
-  const handleExportCSV = () => {
-    setIsExporting(true)
-    setTimeout(() => {
+  const handleExportCSV = async () => {
+    const activeFields = Object.keys(selectedFields).filter((k) => selectedFields[k])
+    if (activeFields.length === 0) {
+      alert('Pilih setidaknya satu atribut data untuk diekspor.')
+      return
+    }
+
+    try {
+      setIsExporting(true)
+      const result = await researchService.exportCsv({
+        period: dateRange,
+        fields: activeFields,
+      })
+      if (result.success) {
+        setDownloadedFileName(result.filename)
+        setDownloadSuccess(true)
+        setTimeout(() => setDownloadSuccess(false), 5000)
+      }
+    } catch (err) {
+      console.error('Export CSV failed:', err)
+      alert('Gagal mengekspor dataset: ' + (err.response?.data?.message || err.message))
+    } finally {
       setIsExporting(false)
-      setDownloadSuccess(true)
-      setTimeout(() => setDownloadSuccess(false), 4000)
-    }, 800)
+    }
   }
 
   const columns = [
@@ -118,7 +156,7 @@ export default function ResearchExportPage() {
       {downloadSuccess && (
         <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 px-4 py-3 rounded-2xl flex items-center gap-2 text-xs font-bold animate-in fade-in">
           <span className="material-symbols-outlined text-emerald-600">check_circle</span>
-          <span>Berkas dataset anonim berhasil diunduh: research_dataset_margodadi_sep2026.csv</span>
+          <span>Berkas dataset anonim berhasil diunduh: {downloadedFileName || 'research_dataset_margodadi.csv'}</span>
         </div>
       )}
 
@@ -159,7 +197,7 @@ export default function ResearchExportPage() {
                   key={t.val}
                   type="button"
                   onClick={() => setDateRange(t.val)}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold border ${
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
                     dateRange === t.val
                       ? 'bg-primary text-white border-primary'
                       : 'bg-slate-50 text-slate-700 border-slate-200'
@@ -210,10 +248,19 @@ export default function ResearchExportPage() {
               Contoh struktur data yang akan tersimpan dalam file CSV ekspor
             </p>
           </div>
-          <span className="text-xs text-slate-400 font-mono">5 Sampel Ditampilkan</span>
+          <span className="text-xs text-slate-400 font-mono">{previewData.length} Sampel Ditampilkan</span>
         </div>
 
-        <DataTable columns={columns} data={initialEducationSessions} />
+        {isLoadingPreview ? (
+          <div className="p-12 text-center bg-white rounded-2xl">
+            <span className="material-symbols-outlined text-3xl text-primary animate-spin">
+              progress_activity
+            </span>
+            <p className="text-xs text-slate-500 mt-2">Memuat pratinjau dataset...</p>
+          </div>
+        ) : (
+          <DataTable columns={columns} data={previewData} />
+        )}
       </div>
     </div>
   )

@@ -25,8 +25,8 @@ export default function ConversationDetailPage() {
   }
 
   // Load conversation details and operators
-  const loadData = useCallback(async () => {
-    setIsLoading(true)
+  const loadData = useCallback(async (isQuiet = false) => {
+    if (!isQuiet) setIsLoading(true)
     try {
       const [convRes, opsRes] = await Promise.all([
         conversationService.getConversationById(conversationId),
@@ -41,14 +41,21 @@ export default function ConversationDetailPage() {
       }
     } catch (err) {
       console.error('Failed to load conversation details:', err)
-      showToast('Gagal memuat detail percakapan.')
+      if (!isQuiet) showToast('Gagal memuat detail percakapan.')
     } finally {
-      setIsLoading(false)
+      if (!isQuiet) setIsLoading(false)
     }
   }, [conversationId])
 
   useEffect(() => {
     loadData()
+
+    // 5s polling interval for real-time chat updates
+    const interval = setInterval(() => {
+      loadData(true)
+    }, 5000)
+
+    return () => clearInterval(interval)
   }, [loadData])
 
   // HITL Handlers

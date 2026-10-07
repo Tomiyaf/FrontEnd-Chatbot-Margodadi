@@ -1,24 +1,59 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import StatCard from '../../components/admin/StatCard'
 import StatusBadge from '../../components/admin/StatusBadge'
 import ChannelBadge from '../../components/admin/ChannelBadge'
 import CategoryBadge from '../../components/admin/CategoryBadge'
 import ActivityTimeline from '../../components/admin/ActivityTimeline'
-import {
-  initialAnalytics,
-  initialConversations,
-  initialActivityLogs,
-  initialKnowledgeBaseStatus,
-} from '../../data/adminMockData'
+import dashboardService from '../../services/dashboardService'
 
 export default function DashboardPage() {
   const navigate = useNavigate()
   const [selectedPeriod, setSelectedPeriod] = useState('MONTH') // 'TODAY' | 'WEEK' | 'MONTH'
+  const [loading, setLoading] = useState(true)
+  const [dashboardData, setDashboardData] = useState(null)
 
-  const { kpi, channels, statuses, categories, trendDays } = initialAnalytics
-  const hitlQueue = initialConversations.filter((c) => c.needsHuman && c.status !== 'RESOLVED')
-  const recentActivities = initialActivityLogs.slice(0, 5)
+  useEffect(() => {
+    let isMounted = true
+    const fetchDashboard = async () => {
+      setLoading(true)
+      try {
+        const res = await dashboardService.getDashboardStats(selectedPeriod)
+        if (isMounted && res?.data) {
+          setDashboardData(res.data)
+        }
+      } catch (err) {
+        console.error('Failed to load dashboard statistics:', err)
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+    fetchDashboard()
+    return () => {
+      isMounted = false
+    }
+  }, [selectedPeriod])
+
+  const kpi = dashboardData?.kpi || {
+    total_conversations: 0,
+    active_conversations: 0,
+    need_human_count: 0,
+    assigned_count: 0,
+    total_resolved: 0,
+    online_operators: 0,
+    total_operators: 0,
+    avg_response_time: '2.4 mnt',
+    satisfaction_rating: 4.85,
+  }
+
+  const channels = dashboardData?.channels || { website: 0, whatsapp: 0 }
+  const totalChannels = (channels.website + channels.whatsapp) || 1
+  const webPercentage = Math.round((channels.website / totalChannels) * 100)
+  const waPercentage = Math.round((channels.whatsapp / totalChannels) * 100)
+
+  const categories = dashboardData?.categories || []
+  const hitlQueue = dashboardData?.recent_hitl || []
+  const recentActivities = dashboardData?.recent_activities || []
 
   return (
     <div className="space-y-6">
@@ -102,7 +137,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
         <StatCard
           title="Total Percakapan"
-          value={kpi.totalConversations.toLocaleString('id-ID')}
+          value={loading ? '...' : (kpi.total_conversations || 0).toLocaleString('id-ID')}
           subtitle="Semua sesi layanan"
           icon="mark_chat_unread"
           trend="+14.2% bln lalu"
@@ -111,7 +146,7 @@ export default function DashboardPage() {
 
         <StatCard
           title="Percakapan Aktif"
-          value={kpi.activeConversations}
+          value={loading ? '...' : (kpi.active_conversations || 0)}
           subtitle="Sedang berlangsung"
           icon="chat_bubble"
           badge="Live"
@@ -119,7 +154,7 @@ export default function DashboardPage() {
 
         <StatCard
           title="Perlu Operator"
-          value={kpi.needHumanCount}
+          value={loading ? '...' : (kpi.need_human_count || 0)}
           subtitle="Eskalasi Human (HITL)"
           icon="crisis_alert"
           trend="Perlu respon"
@@ -130,7 +165,7 @@ export default function DashboardPage() {
 
         <StatCard
           title="Sedang Ditangani"
-          value={kpi.assignedCount}
+          value={loading ? '...' : (kpi.assigned_count || 0)}
           subtitle="Oleh operator pekon"
           icon="support_agent"
           trend="Sedang diproses"
@@ -139,10 +174,10 @@ export default function DashboardPage() {
 
         <StatCard
           title="Selesai (Resolved)"
-          value={kpi.resolvedCount.toLocaleString('id-ID')}
+          value={loading ? '...' : (kpi.total_resolved || 0).toLocaleString('id-ID')}
           subtitle="Tuntas terlayani"
           icon="verified"
-          trend="95.5% terselesaikan"
+          trend="Terselesaikan"
           trendType="positive"
         />
       </div>
@@ -167,12 +202,12 @@ export default function DashboardPage() {
                     <span className="material-symbols-outlined text-sm text-indigo-600">language</span>
                     Website Portal Margodadi
                   </span>
-                  <span className="font-bold text-slate-900">{channels.website} sesi (62.6%)</span>
+                  <span className="font-bold text-slate-900">{channels.website} sesi ({webPercentage}%)</span>
                 </div>
                 <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-indigo-600 rounded-full transition-all duration-500"
-                    style={{ width: '62.6%' }}
+                    style={{ width: `${webPercentage}%` }}
                   ></div>
                 </div>
               </div>
@@ -183,12 +218,12 @@ export default function DashboardPage() {
                     <span className="material-symbols-outlined text-sm text-emerald-600">chat</span>
                     WhatsApp Gateway
                   </span>
-                  <span className="font-bold text-slate-900">{channels.whatsapp} sesi (37.4%)</span>
+                  <span className="font-bold text-slate-900">{channels.whatsapp} sesi ({waPercentage}%)</span>
                 </div>
                 <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-emerald-600 rounded-full transition-all duration-500"
-                    style={{ width: '37.4%' }}
+                    style={{ width: `${waPercentage}%` }}
                   ></div>
                 </div>
               </div>
@@ -203,13 +238,23 @@ export default function DashboardPage() {
             <div className="grid grid-cols-2 gap-2 text-center pt-1">
               <div className="bg-emerald-50 border border-emerald-200 p-2.5 rounded-lg">
                 <span className="text-[10px] text-emerald-800 font-bold uppercase">Dijawab AI RAG</span>
-                <p className="text-xl font-black text-emerald-800">{kpi.autoResponseRatio}</p>
-                <span className="text-[10px] text-emerald-700 font-medium">1.010 sesi otomatis</span>
+                <p className="text-xl font-black text-emerald-800">
+                  {kpi.total_conversations > 0
+                    ? `${Math.round(((kpi.total_conversations - kpi.need_human_count) / kpi.total_conversations) * 100)}%`
+                    : '85%'}
+                </p>
+                <span className="text-[10px] text-emerald-700 font-medium">
+                  {Math.max(0, (kpi.total_conversations || 0) - (kpi.need_human_count || 0))} sesi otomatis
+                </span>
               </div>
               <div className="bg-amber-50 border border-amber-200 p-2.5 rounded-lg">
                 <span className="text-[10px] text-amber-800 font-bold uppercase">Bantuan Operator</span>
-                <p className="text-xl font-black text-amber-800">{kpi.humanInterventionRatio}</p>
-                <span className="text-[10px] text-amber-700 font-medium">235 sesi HITL</span>
+                <p className="text-xl font-black text-amber-800">
+                  {kpi.total_conversations > 0
+                    ? `${Math.round((kpi.need_human_count / kpi.total_conversations) * 100)}%`
+                    : '15%'}
+                </p>
+                <span className="text-[10px] text-amber-700 font-medium">{kpi.need_human_count || 0} sesi HITL</span>
               </div>
             </div>
           </div>
@@ -228,24 +273,24 @@ export default function DashboardPage() {
 
             <div className="grid grid-cols-2 gap-2.5">
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/70">
-                <span className="text-[10px] font-bold uppercase text-slate-500">Open</span>
-                <p className="text-lg font-black text-slate-800">{statuses.open}</p>
-                <span className="text-[10px] text-slate-400">Belum direspons</span>
+                <span className="text-[10px] font-bold uppercase text-slate-500">Aktif</span>
+                <p className="text-lg font-black text-slate-800">{kpi.active_conversations || 0}</p>
+                <span className="text-[10px] text-slate-400">Sedang berjalan</span>
               </div>
-              <div className="p-3 bg-amber-50/60 rounded-xl border border-amber-200/70">
-                <span className="text-[10px] font-bold uppercase text-amber-800">Pending</span>
-                <p className="text-lg font-black text-amber-800">{statuses.pending}</p>
-                <span className="text-[10px] text-amber-700">Menunggu info warga</span>
+              <div className="p-3 bg-rose-50/60 rounded-xl border border-rose-200/70">
+                <span className="text-[10px] font-bold uppercase text-rose-800">Perlu Human</span>
+                <p className="text-lg font-black text-rose-800">{kpi.need_human_count || 0}</p>
+                <span className="text-[10px] text-rose-700">Antrian eskalasi</span>
               </div>
               <div className="p-3 bg-sky-50/60 rounded-xl border border-sky-200/70">
                 <span className="text-[10px] font-bold uppercase text-sky-800">Assigned</span>
-                <p className="text-lg font-black text-sky-800">{statuses.assigned}</p>
+                <p className="text-lg font-black text-sky-800">{kpi.assigned_count || 0}</p>
                 <span className="text-[10px] text-sky-700">Dipegang operator</span>
               </div>
               <div className="p-3 bg-emerald-50/60 rounded-xl border border-emerald-200/70">
                 <span className="text-[10px] font-bold uppercase text-emerald-800">Resolved</span>
-                <p className="text-lg font-black text-emerald-800">{statuses.resolved}</p>
-                <span className="text-[10px] text-emerald-700">Telah selesai</span>
+                <p className="text-lg font-black text-emerald-800">{kpi.total_resolved || 0}</p>
+                <span className="text-[10px] text-emerald-700">Tuntas terlayani</span>
               </div>
             </div>
           </div>
@@ -254,7 +299,7 @@ export default function DashboardPage() {
             <div>
               <span className="text-slate-500 block text-[11px]">Rata-rata Waktu Respon Operator</span>
               <strong className="text-slate-900 text-sm font-bold">
-                {kpi.avgOperatorResponseTimeMinutes} Menit
+                {kpi.avg_response_time || '2.4 mnt'}
               </strong>
             </div>
             <span className="px-2 py-1 rounded-md bg-emerald-100 text-emerald-800 font-bold text-[11px]">
@@ -275,20 +320,24 @@ export default function DashboardPage() {
             </div>
 
             <div className="space-y-2.5">
-              {categories.map((cat, idx) => (
-                <div key={idx} className="space-y-1">
-                  <div className="flex justify-between text-xs font-semibold">
-                    <span className="text-slate-700 truncate">{cat.name}</span>
-                    <span className="text-slate-900 shrink-0 font-bold">{cat.count} sesi</span>
+              {categories.length > 0 ? (
+                categories.map((cat, idx) => (
+                  <div key={idx} className="space-y-1">
+                    <div className="flex justify-between text-xs font-semibold">
+                      <span className="text-slate-700 truncate">{cat.name}</span>
+                      <span className="text-slate-900 shrink-0 font-bold">{cat.count} sesi</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary rounded-full transition-all duration-500"
+                        style={{ width: `${Math.min(100, (cat.percentage || 1) * 2)}%` }}
+                      ></div>
+                    </div>
                   </div>
-                  <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary rounded-full transition-all duration-500"
-                      style={{ width: `${cat.percentage * 2}%` }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <div className="text-xs text-slate-400 py-4 text-center">Belum ada kategori terdata</div>
+              )}
             </div>
           </div>
 
@@ -326,49 +375,59 @@ export default function DashboardPage() {
           </div>
 
           <div className="divide-y divide-slate-100">
-            {initialConversations.map((conv) => (
-              <div
-                key={conv.id}
-                onClick={() => navigate(`/admin/conversations/${conv.id}`)}
-                className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/80 px-2 rounded-xl transition-colors cursor-pointer group"
-              >
-                <div className="flex items-start gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 text-slate-600 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                    <span className="material-symbols-outlined text-xl">
-                      {conv.channel === 'whatsapp' ? 'chat' : 'language'}
+            {hitlQueue.length > 0 ? (
+              hitlQueue.map((conv) => (
+                <div
+                  key={conv.id || conv.conversation_id}
+                  onClick={() => navigate(`/admin/conversations/${conv.id || conv.conversation_id}`)}
+                  className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/80 px-2 rounded-xl transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-start gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 text-slate-600 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                      <span className="material-symbols-outlined text-xl">
+                        {conv.channel === 'whatsapp' ? 'chat' : 'language'}
+                      </span>
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                        <span className="text-xs font-mono font-bold text-slate-800">
+                          {conv.id}
+                        </span>
+                        <span className="text-slate-300">·</span>
+                        <span className="text-xs font-bold text-slate-900 truncate">
+                          {conv.citizen_name || conv.citizenName}
+                        </span>
+                        <ChannelBadge channel={conv.channel} showIconOnly />
+                        <CategoryBadge category={conv.category} />
+                      </div>
+                      <p className="text-xs text-slate-600 truncate leading-relaxed">
+                        {conv.last_message || conv.lastMessage}
+                      </p>
+                      <div className="mt-1 text-[11px] text-slate-400 flex items-center gap-2">
+                        <span>Operator: {conv.assigned_operator?.name || conv.assignedOperator?.name || 'Belum ditugaskan'}</span>
+                        {conv.updated_at && (
+                          <>
+                            <span>·</span>
+                            <span>{new Date(conv.updated_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                    <StatusBadge status={conv.status} needsHuman={conv.needs_human ?? conv.needsHuman} />
+                    <span className="material-symbols-outlined text-slate-400 group-hover:text-primary group-hover:translate-x-0.5 transition-all text-lg">
+                      chevron_right
                     </span>
                   </div>
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-1.5 mb-1">
-                      <span className="text-xs font-mono font-bold text-slate-800">
-                        {conv.id}
-                      </span>
-                      <span className="text-slate-300">·</span>
-                      <span className="text-xs font-bold text-slate-900 truncate">
-                        {conv.citizenName}
-                      </span>
-                      <ChannelBadge channel={conv.channel} showIconOnly />
-                      <CategoryBadge category={conv.category} />
-                    </div>
-                    <p className="text-xs text-slate-600 truncate leading-relaxed">
-                      {conv.lastMessage}
-                    </p>
-                    <div className="mt-1 text-[11px] text-slate-400 flex items-center gap-2">
-                      <span>Operator: {conv.assignedOperator?.name || 'Belum ditugaskan'}</span>
-                      <span>·</span>
-                      <span>{new Date(conv.updatedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</span>
-                    </div>
-                  </div>
                 </div>
-
-                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                  <StatusBadge status={conv.status} needsHuman={conv.needsHuman} />
-                  <span className="material-symbols-outlined text-slate-400 group-hover:text-primary group-hover:translate-x-0.5 transition-all text-lg">
-                    chevron_right
-                  </span>
-                </div>
+              ))
+            ) : (
+              <div className="py-8 text-center text-xs text-slate-400">
+                Tidak ada percakapan tertunda dalam antrian HITL
               </div>
-            ))}
+            )}
           </div>
         </div>
 
@@ -424,7 +483,12 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
-          {initialKnowledgeBaseStatus.map((kb, idx) => (
+          {(dashboardData?.knowledge_base_status || [
+            { domain: 'Layanan Publik & Administrasi Pekon', version: 'v2.1', itemCount: 12, validator: 'Kasi Pemerintahan', updatedAt: 'Hari ini' },
+            { domain: 'Potensi & Katalog Produk UMKM Pekon', version: 'v1.4', itemCount: 6, validator: 'Kaur Perencanaan', updatedAt: 'Hari ini' },
+            { domain: 'Edukasi 3R & Bank Sampah Margodadi', version: 'v2.1', itemCount: 5, validator: 'Tim Pengelola Sampah', updatedAt: 'Hari ini' },
+            { domain: 'SOP Diskresi & Regulasi Aparatur Pekon', version: 'v1.0', itemCount: 4, validator: 'Sekdes Margodadi', updatedAt: 'Hari ini' },
+          ]).map((kb, idx) => (
             <div
               key={idx}
               className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 hover:bg-slate-100/60 transition-colors"
@@ -447,3 +511,4 @@ export default function DashboardPage() {
     </div>
   )
 }
+
