@@ -1,51 +1,67 @@
+import React, { lazy, Suspense } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
-import PublicLayout from '../layouts/PublicLayout'
-import AdminLayout from '../layouts/AdminLayout'
-import HomePage from '../pages/public/HomePage'
-import LayananPublikPage from '../pages/public/LayananPublikPage'
-import PotensiUmkmPage from '../pages/public/PotensiUmkmPage'
-import EdukasiSampahPage from '../pages/public/EdukasiSampahPage'
-import TanyaVirtualGuidePage from '../pages/public/TanyaVirtualGuidePage'
-import LoginPage from '../pages/auth/LoginPage'
-import DashboardPage from '../pages/admin/DashboardPage'
-import ConversationsPage from '../pages/admin/ConversationsPage'
-import ConversationDetailPage from '../pages/admin/ConversationDetailPage'
-import OperatorsPage from '../pages/admin/OperatorsPage'
-import AnalyticsPage from '../pages/admin/AnalyticsPage'
-import EducationPage from '../pages/admin/EducationPage'
-import ReportsPage from '../pages/admin/ReportsPage'
-import KnowledgeBasePage from '../pages/admin/KnowledgeBasePage'
-import ActivityLogPage from '../pages/admin/ActivityLogPage'
-import SettingsPage from '../pages/admin/SettingsPage'
-import NotFoundPage from '../pages/NotFoundPage'
-
+import PageLoader from '../components/common/PageLoader'
 import ProtectedRoute from '../components/auth/ProtectedRoute'
+
+// Layouts
+const PublicLayout = lazy(() => import('../layouts/PublicLayout'))
+const AdminLayout = lazy(() => import('../layouts/AdminLayout'))
+
+// Layer Front-Office (Masyarakat / Publik)
+const HomePage = lazy(() => import('../pages/public/HomePage'))
+const LayananPublikPage = lazy(() => import('../pages/public/LayananPublikPage'))
+const PotensiUmkmPage = lazy(() => import('../pages/public/PotensiUmkmPage'))
+const EdukasiSampahPage = lazy(() => import('../pages/public/EdukasiSampahPage'))
+const TanyaVirtualGuidePage = lazy(() => import('../pages/public/TanyaVirtualGuidePage'))
+
+// Autentikasi
+const LoginPage = lazy(() => import('../pages/auth/LoginPage'))
+
+// Layer Back-Office (Admin / Operator Monitoring & HITL Layer)
+const DashboardPage = lazy(() => import('../pages/admin/DashboardPage'))
+const ConversationsPage = lazy(() => import('../pages/admin/ConversationsPage'))
+const ConversationDetailPage = lazy(() => import('../pages/admin/ConversationDetailPage'))
+const OperatorsPage = lazy(() => import('../pages/admin/OperatorsPage'))
+const AnalyticsPage = lazy(() => import('../pages/admin/AnalyticsPage'))
+const EducationPage = lazy(() => import('../pages/admin/EducationPage'))
+const ReportsPage = lazy(() => import('../pages/admin/ReportsPage'))
+const KnowledgeBasePage = lazy(() => import('../pages/admin/KnowledgeBasePage'))
+const ActivityLogPage = lazy(() => import('../pages/admin/ActivityLogPage'))
+const SettingsPage = lazy(() => import('../pages/admin/SettingsPage'))
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage'))
+
+// Suspense Helper
+const withSuspense = (Component, loadingTitle) => (
+  <Suspense fallback={<PageLoader title={loadingTitle} />}>
+    <Component />
+  </Suspense>
+)
 
 export const router = createBrowserRouter([
   // Layer Front-Office (Masyarakat / Publik)
   {
     path: '/',
-    element: <PublicLayout />,
+    element: withSuspense(PublicLayout, 'Memuat Portal Margodadi...'),
     children: [
       {
         index: true,
-        element: <HomePage />,
+        element: withSuspense(HomePage, 'Memuat Beranda Portal...'),
       },
       {
         path: 'layanan-publik',
-        element: <LayananPublikPage />,
+        element: withSuspense(LayananPublikPage, 'Memuat Panduan Layanan...'),
       },
       {
         path: 'potensi-umkm',
-        element: <PotensiUmkmPage />,
+        element: withSuspense(PotensiUmkmPage, 'Memuat Direktori UMKM...'),
       },
       {
         path: 'edukasi-sampah',
-        element: <EdukasiSampahPage />,
+        element: withSuspense(EdukasiSampahPage, 'Memuat Panduan Pilah Sampah...'),
       },
       {
         path: 'tanya-virtual-guide',
-        element: <TanyaVirtualGuidePage />,
+        element: withSuspense(TanyaVirtualGuidePage, 'Menghubungkan Virtual Guide...'),
       },
     ],
   },
@@ -53,7 +69,7 @@ export const router = createBrowserRouter([
   // Autentikasi Back-Office
   {
     path: '/login',
-    element: <LoginPage />,
+    element: withSuspense(LoginPage, 'Menyiapkan Akses Masuk...'),
   },
 
   // Layer Back-Office (Admin / Operator Monitoring & HITL Layer)
@@ -62,80 +78,81 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       {
-        element: <AdminLayout />,
+        element: withSuspense(AdminLayout, 'Memuat Panel Administrasi...'),
         children: [
           {
             index: true,
-            element: <DashboardPage />,
+            element: withSuspense(DashboardPage, 'Memuat Executive Dashboard...'),
           },
-      {
-        path: 'dashboard',
-        element: <DashboardPage />,
-      },
-      {
-        path: 'conversations',
-        element: <ConversationsPage />,
-      },
-      {
-        path: 'conversations/hitl',
-        element: <ConversationsPage />,
-      },
-      {
-        path: 'conversations/assigned',
-        element: <ConversationsPage />,
-      },
-      {
-        path: 'conversations/pending',
-        element: <ConversationsPage />,
-      },
-      {
-        path: 'conversations/resolved',
-        element: <ConversationsPage />,
-      },
-      {
-        path: 'conversations/:conversationId',
-        element: <ConversationDetailPage />,
-      },
-      {
-        path: 'operators',
-        element: <OperatorsPage />,
-      },
-      {
-        path: 'analytics',
-        element: <AnalyticsPage />,
-      },
-      {
-        path: 'education',
-        element: <EducationPage />,
-      },
-      {
-        path: 'reports',
-        element: <ReportsPage />,
-      },
-      {
-        path: 'knowledge-base',
-        element: <KnowledgeBasePage />,
-      },
-      {
-        path: 'research-export',
-        element: <Navigate to="/admin/knowledge-base" replace />,
-      },
-      {
-        path: 'activity-log',
-        element: <ActivityLogPage />,
-      },
-      {
-        path: 'settings',
-        element: <SettingsPage />,
+          {
+            path: 'dashboard',
+            element: withSuspense(DashboardPage, 'Memuat Executive Dashboard...'),
+          },
+          {
+            path: 'conversations',
+            element: withSuspense(ConversationsPage, 'Memuat Antrean Tiket...'),
+          },
+          {
+            path: 'conversations/hitl',
+            element: withSuspense(ConversationsPage, 'Memuat Tiket Butuh Bantuan...'),
+          },
+          {
+            path: 'conversations/assigned',
+            element: withSuspense(ConversationsPage, 'Memuat Tiket Ditugaskan...'),
+          },
+          {
+            path: 'conversations/pending',
+            element: withSuspense(ConversationsPage, 'Memuat Tiket Tertunda...'),
+          },
+          {
+            path: 'conversations/resolved',
+            element: withSuspense(ConversationsPage, 'Memuat Tiket Selesai...'),
+          },
+          {
+            path: 'conversations/:conversationId',
+            element: withSuspense(ConversationDetailPage, 'Memuat Detail Percakapan...'),
+          },
+          {
+            path: 'operators',
+            element: withSuspense(OperatorsPage, 'Memuat Direktori Operator...'),
+          },
+          {
+            path: 'analytics',
+            element: withSuspense(AnalyticsPage, 'Menghitung Analitik SLA...'),
+          },
+          {
+            path: 'education',
+            element: withSuspense(EducationPage, 'Memuat Riset Edukasi Sampah...'),
+          },
+          {
+            path: 'reports',
+            element: withSuspense(ReportsPage, 'Menyiapkan Laporan Eksekutif...'),
+          },
+          {
+            path: 'knowledge-base',
+            element: withSuspense(KnowledgeBasePage, 'Menghubungkan AI Vector Store...'),
+          },
+          {
+            path: 'research-export',
+            element: <Navigate to="/admin/knowledge-base" replace />,
+          },
+          {
+            path: 'activity-log',
+            element: withSuspense(ActivityLogPage, 'Memuat Log Aktivitas Sistem...'),
+          },
+          {
+            path: 'settings',
+            element: withSuspense(SettingsPage, 'Memuat Pengaturan Sistem...'),
+          },
+        ],
       },
     ],
   },
-  ],
-},
 
   // Rute fallback 404
   {
     path: '*',
-    element: <NotFoundPage />,
+    element: withSuspense(NotFoundPage, 'Halaman Tidak Ditemukan'),
   },
 ])
+

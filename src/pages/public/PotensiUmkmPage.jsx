@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import publicService from '../../services/publicService'
+import LazyImage from '../../components/common/LazyImage'
 
 export default function PotensiUmkmPage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -212,13 +213,12 @@ export default function PotensiUmkmPage() {
               >
                 {/* Image Header with Badge */}
                 <div className="relative h-56 w-full overflow-hidden bg-surface-container">
-                  <img
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  <LazyImage
+                    className="w-full h-full group-hover:scale-105 transition-transform duration-500"
                     src={item.image}
                     alt={item.name}
-                    loading="lazy"
                   />
-                  <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                  <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
                     <span className="bg-primary/90 backdrop-blur-md text-on-primary text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">
                       {item.categoryBadge}
                     </span>
@@ -512,11 +512,10 @@ export default function PotensiUmkmPage() {
                             )
                           }
                         >
-                          <img
-                            className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-300"
+                          <LazyImage
+                            className="w-full h-full group-hover/img:scale-110 transition-transform duration-300"
                             src={imgUrl}
                             alt={`${selectedProfileModal.name} Dokumentasi ${gidx + 1}`}
-                            loading="lazy"
                           />
                         </div>
                       ))}

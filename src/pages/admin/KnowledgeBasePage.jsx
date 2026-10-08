@@ -1,9 +1,11 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, lazy } from 'react'
 import DataTable from '../../components/admin/DataTable'
 import Pagination from '../../components/admin/Pagination'
-import KnowledgeDocModal from '../../components/admin/KnowledgeDocModal'
-import ChunkInspectorModal from '../../components/admin/ChunkInspectorModal'
+import LazyModal from '../../components/common/LazyModal'
 import { knowledgeBaseService } from '../../services/knowledgeBaseService'
+
+const KnowledgeDocModal = lazy(() => import('../../components/admin/KnowledgeDocModal'))
+const ChunkInspectorModal = lazy(() => import('../../components/admin/ChunkInspectorModal'))
 
 export default function KnowledgeBasePage() {
   const [activeTab, setActiveTab] = useState('documents') // 'documents' | 'simulator' | 'config'
@@ -808,22 +810,30 @@ export default function KnowledgeBasePage() {
         </div>
       )}
 
-      {/* Modals */}
-      <KnowledgeDocModal
+      {/* Modals On-Demand (Lazy Loaded) */}
+      <LazyModal
         isOpen={isDocModalOpen}
         onClose={() => setIsDocModalOpen(false)}
-        onSubmit={handleSaveDocument}
-        documentData={editingDoc}
-        isLoading={isSavingDoc}
+        Component={KnowledgeDocModal}
+        fallbackTitle="Menyiapkan Editor Dokumen..."
+        componentProps={{
+          onSubmit: handleSaveDocument,
+          documentData: editingDoc,
+          isLoading: isSavingDoc,
+        }}
       />
 
-      <ChunkInspectorModal
+      <LazyModal
         isOpen={isInspectorOpen}
         onClose={() => setIsInspectorOpen(false)}
-        documentData={inspectingDoc}
-        onUpdateChunk={handleUpdateChunk}
-        onDeleteChunk={handleDeleteChunk}
-        onReindexDoc={handleReindexDocument}
+        Component={ChunkInspectorModal}
+        fallbackTitle="Membuka Inspector Vector Chunks..."
+        componentProps={{
+          documentData: inspectingDoc,
+          onUpdateChunk: handleUpdateChunk,
+          onDeleteChunk: handleDeleteChunk,
+          onReindexDoc: handleReindexDocument,
+        }}
       />
     </div>
   )

@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy } from 'react'
 import StatCard from '../../components/admin/StatCard'
 import StatusBadge from '../../components/admin/StatusBadge'
 import ChannelBadge from '../../components/admin/ChannelBadge'
 import DataTable from '../../components/admin/DataTable'
-import ExportModal from '../../components/admin/ExportModal'
+import LazyModal from '../../components/common/LazyModal'
 import { educationService } from '../../services/educationService'
 import { researchService } from '../../services/researchService'
+
+const ExportModal = lazy(() => import('../../components/admin/ExportModal'))
 
 export default function EducationPage() {
   const [sessions, setSessions] = useState([])
@@ -279,14 +281,18 @@ export default function EducationPage() {
         )}
       </div>
 
-      {/* Export Modal */}
-      <ExportModal
+      {/* Export Modal On-Demand */}
+      <LazyModal
         isOpen={isExportOpen}
         onClose={() => setIsExportOpen(false)}
-        title="Export Data Sesi Edukasi Sampah"
-        description="Pilih parameter untuk mengunduh rekap sesi edukasi warga Margodadi."
-        availableFields={availableExportFields}
-        onExport={handleExport}
+        Component={ExportModal}
+        fallbackTitle="Menyiapkan Panel Ekspor..."
+        componentProps={{
+          title: 'Export Data Sesi Edukasi Sampah',
+          description: 'Pilih parameter untuk mengunduh rekap sesi edukasi warga Margodadi.',
+          availableFields: availableExportFields,
+          onExport: handleExport,
+        }}
       />
     </div>
   )

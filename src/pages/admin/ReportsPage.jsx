@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
-import ExportModal from '../../components/admin/ExportModal'
+import { useState, useEffect, lazy } from 'react'
+import LazyModal from '../../components/common/LazyModal'
 import { analyticsService } from '../../services/analyticsService'
 import { dashboardService } from '../../services/dashboardService'
 import { researchService } from '../../services/researchService'
+
+const ExportModal = lazy(() => import('../../components/admin/ExportModal'))
 
 export default function ReportsPage() {
   const [reportPeriod, setReportPeriod] = useState('MONTH')
@@ -287,14 +289,18 @@ export default function ReportsPage() {
         </div>
       </div>
 
-      {/* Export Modal */}
-      <ExportModal
+      {/* Export Modal On-Demand */}
+      <LazyModal
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
-        title="Unduh Berkas Laporan Layanan"
-        description="Pilih format berkas dan rincian data laporan yang ingin diunduh."
-        availableFields={reportFields}
-        onExport={handleExport}
+        Component={ExportModal}
+        fallbackTitle="Menyiapkan Laporan..."
+        componentProps={{
+          title: 'Unduh Berkas Laporan Layanan',
+          description: 'Pilih format berkas dan rincian data laporan yang ingin diunduh.',
+          availableFields: reportFields,
+          onExport: handleExport,
+        }}
       />
     </div>
   )
