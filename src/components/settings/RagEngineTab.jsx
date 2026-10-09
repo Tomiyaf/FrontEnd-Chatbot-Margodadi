@@ -88,7 +88,7 @@ export default function RagEngineTab({
                 min="1"
                 max="15"
                 value={ragSettings.top_k}
-                onChange={(e) => setRagSettings({ ...ragSettings, top_k: parseInt(e.target.value, 10) || 5 })}
+                onChange={(e) => setRagSettings({ ...ragSettings, top_k: parseInt(e.target.value, 10) || 3 })}
                 className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
               />
             </div>

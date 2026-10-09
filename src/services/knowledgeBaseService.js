@@ -28,10 +28,23 @@ export const knowledgeBaseService = {
   },
 
   /**
-   * Create a new knowledge document with auto-chunking
-   * @param {Object} data - { title, domain, source, validator, version, is_active, content }
+   * Create a new knowledge document with auto-indexing
+   * @param {Object} data - { title, domain, source, validator, version, is_active, content, file }
    */
   async createDocument(data) {
+    if (data.file) {
+      const formData = new FormData()
+      Object.entries(data).forEach(([key, value]) => {
+        if (value === undefined || value === null || value === '') return
+        formData.append(key, key === 'is_active' ? (value ? '1' : '0') : value)
+      })
+
+      const response = await api.post('/admin/knowledge-base/documents', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      return response.data
+    }
+
     const response = await api.post('/admin/knowledge-base/documents', data)
     return response.data
   },

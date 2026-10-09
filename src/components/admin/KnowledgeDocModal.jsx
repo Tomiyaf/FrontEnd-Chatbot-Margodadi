@@ -14,6 +14,7 @@ export default function KnowledgeDocModal({
   const [version, setVersion] = useState('v1.0')
   const [isActive, setIsActive] = useState(true)
   const [content, setContent] = useState('')
+  const [selectedFile, setSelectedFile] = useState(null)
 
   useEffect(() => {
     if (documentData) {
@@ -23,6 +24,7 @@ export default function KnowledgeDocModal({
       setValidator(documentData.validator || 'Kasi Pelayanan')
       setVersion(documentData.version || 'v1.0')
       setIsActive(documentData.is_active ?? true)
+      setSelectedFile(null)
       // If documentData has chunks, join them as default content
       if (documentData.chunks && documentData.chunks.length > 0) {
         setContent(documentData.chunks.map((c) => c.content).join('\n\n'))
@@ -37,6 +39,7 @@ export default function KnowledgeDocModal({
       setVersion('v1.0')
       setIsActive(true)
       setContent('')
+      setSelectedFile(null)
     }
   }, [documentData, isOpen])
 
@@ -54,6 +57,7 @@ export default function KnowledgeDocModal({
       version,
       is_active: isActive,
       content,
+      file: selectedFile,
     })
   }
 
@@ -182,16 +186,35 @@ export default function KnowledgeDocModal({
           </div>
 
           <div>
+            {!documentData && (
+              <div className="mb-4">
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Upload File SOP / Dokumen
+                </label>
+                <input
+                  type="file"
+                  accept=".pdf,.docx,.xlsx,.xls,.txt"
+                  onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all file:mr-3 file:border-0 file:bg-primary/10 file:text-primary file:rounded-lg file:px-3 file:py-1.5 file:text-xs file:font-bold"
+                />
+                {selectedFile && (
+                  <p className="text-[11px] text-emerald-700 font-medium mt-1">
+                    File siap diindeks: {selectedFile.name}
+                  </p>
+                )}
+              </div>
+            )}
+
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                Materi / Konten Teks Dokumen <span className="text-red-500">*</span>
+                Materi / Konten Teks Dokumen {!selectedFile && <span className="text-red-500">*</span>}
               </label>
               <span className="text-[11px] text-slate-500 font-medium">
                 {content.length} karakter &bull; ~{estimatedChunks} Chunks Vektor
               </span>
             </div>
             <textarea
-              required
+              required={!selectedFile}
               rows={6}
               value={content}
               onChange={(e) => setContent(e.target.value)}
