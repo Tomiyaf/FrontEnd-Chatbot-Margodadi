@@ -53,6 +53,16 @@ export const conversationService = {
     })
     return response.data
   },
+
+  /**
+   * Toggle intervention mode between Operator (Human Takeover) and AI (Bot Resume)
+   * @param {string|number} id - Conversation ID or External ID
+   * @param {Object} payload - { mode: 'OPERATOR'|'AI', notes?: string, notify_citizen?: boolean }
+   */
+  async toggleInterventionMode(id, payload) {
+    const response = await api.patch(`/admin/conversations/${id}/mode`, payload)
+    return response.data
+  },
 }
 
 export default conversationService
