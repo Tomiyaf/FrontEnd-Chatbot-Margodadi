@@ -271,13 +271,17 @@ export default function ConversationsPage() {
                 onClick={() => navigate(`/admin/conversations/${conv.id || conv.conversation_id}`)}
                 className={`p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50/80 transition-all cursor-pointer group ${
                   conv.needs_human && conv.status !== 'RESOLVED'
-                    ? 'bg-rose-50/25 border-l-4 border-l-rose-500'
+                    ? 'bg-amber-50/30 border-l-4 border-l-amber-500'
                     : ''
                 }`}
               >
                 {/* Left Side Info */}
                 <div className="flex items-start gap-3.5 min-w-0 flex-1">
-                  <div className="w-11 h-11 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 text-slate-700 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                  <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border transition-colors ${
+                    conv.channel === 'whatsapp'
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200 group-hover:bg-emerald-600 group-hover:text-white'
+                      : 'bg-slate-100 text-slate-700 border-slate-200 group-hover:bg-primary/10 group-hover:text-primary'
+                  }`}>
                     <span className="material-symbols-outlined text-2xl">
                       {conv.channel === 'whatsapp' ? 'chat' : 'language'}
                     </span>
@@ -293,7 +297,22 @@ export default function ConversationsPage() {
                       </span>
                       <ChannelBadge channel={conv.channel} />
                       <CategoryBadge category={conv.category} />
-                      <StatusBadge status={conv.status} needsHuman={conv.needs_human} />
+                      <StatusBadge status={conv.status} />
+
+                      {/* Intervention Mode Badge */}
+                      {conv.status !== 'RESOLVED' && (
+                        conv.needs_human ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                            <span className="material-symbols-outlined text-[12px] text-amber-700">support_agent</span>
+                            <span>Mode Operator</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            <span className="material-symbols-outlined text-[12px] text-emerald-600">smart_toy</span>
+                            <span>Mode AI</span>
+                          </span>
+                        )
+                      )}
                     </div>
 
                     <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed">
@@ -331,14 +350,6 @@ export default function ConversationsPage() {
 
                 {/* Right Side Actions */}
                 <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
-                  {conv.needs_human && conv.status !== 'RESOLVED' && (
-                    <span className="px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1">
-                      <span className="material-symbols-outlined text-xs animate-bounce">
-                        warning
-                      </span>
-                      Butuh Manusia
-                    </span>
-                  )}
 
                   <button
                     type="button"

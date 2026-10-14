@@ -56,7 +56,7 @@ export default function MessageBubble({ message }) {
             : 'bg-sky-700 text-white rounded-tr-xs border border-sky-800 shadow-sky-900/10'
         }`}
       >
-        <p className="whitespace-pre-wrap">{content}</p>
+        <p className="whitespace-pre-wrap break-words">{content}</p>
 
         {isOperator && (
           <div className="mt-2 pt-1.5 border-t border-sky-600/50 flex items-center justify-between text-[10px] text-sky-100">
