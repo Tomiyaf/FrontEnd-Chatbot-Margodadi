@@ -44,6 +44,7 @@ export default function ConversationsPage() {
       badge: hitlCount > 0 ? String(hitlCount) : null,
       badgeColor: 'bg-rose-500 text-white animate-pulse',
     },
+    { id: 'open', label: 'Baru / Terbuka', icon: 'mark_chat_unread', filterStatus: 'OPEN' },
     { id: 'assigned', label: 'Ditugaskan', icon: 'person', filterStatus: 'ASSIGNED' },
     { id: 'pending', label: 'Pending', icon: 'schedule', filterStatus: 'PENDING' },
     { id: 'resolved', label: 'Selesai', icon: 'check_circle', filterStatus: 'RESOLVED' },
@@ -217,6 +218,7 @@ export default function ConversationsPage() {
           setCurrentPage(1)
           if (val === 'NEED_HUMAN') setActiveTab('hitl')
           else if (val === 'ALL') setActiveTab('all')
+          else if (val === 'OPEN') setActiveTab('open')
           else if (val === 'ASSIGNED') setActiveTab('assigned')
           else if (val === 'PENDING') setActiveTab('pending')
           else if (val === 'RESOLVED') setActiveTab('resolved')

@@ -97,6 +97,10 @@ export const router = createBrowserRouter([
             element: withSuspense(ConversationsPage, 'Memuat Tiket Butuh Bantuan...'),
           },
           {
+            path: 'conversations/open',
+            element: withSuspense(ConversationsPage, 'Memuat Tiket Terbuka / Baru...'),
+          },
+          {
             path: 'conversations/assigned',
             element: withSuspense(ConversationsPage, 'Memuat Tiket Ditugaskan...'),
           },
