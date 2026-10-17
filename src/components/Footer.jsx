@@ -100,11 +100,6 @@ export default function Footer() {
                   Panduan RAG Virtual
                 </Link>
               </li>
-              <li>
-                <Link to="/admin" className="text-emerald-700 font-semibold hover:text-emerald-800 transition-colors">
-                  Portal Back-Office (Admin)
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -131,7 +126,7 @@ export default function Footer() {
         <div className="pt-6 border-t border-surface-container-high/60 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-on-surface-variant">
           <p>© {new Date().getFullYear()} Pemerintah Pekon Margodadi. Seluruh Hak Cipta Dilindungi.</p>
           <p className="text-[11px] text-on-surface-variant/80">
-            Didukung oleh Infrastruktur Sistem Informasi Pekon &amp; LLM RAG Margodadi.
+            Didukung oleh Infrastruktur Sistem Informasi Pekon &amp; Unit Penunjang Akademik Teknologi Informasi dan Komunikasi Universitas Lampung.
           </p>
         </div>
       </div>

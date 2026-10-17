@@ -32,8 +32,8 @@ export default function LoginPage() {
     } catch (err) {
       setErrorMessage(
         err.response?.data?.message ||
-          err.message ||
-          'Autentikasi gagal. Silakan periksa kembali username dan kata sandi Anda.'
+        err.message ||
+        'Autentikasi gagal. Silakan periksa kembali username dan kata sandi Anda.'
       )
     } finally {
       setIsLoading(false)
@@ -49,14 +49,14 @@ export default function LoginPage() {
 
       {/* Main Container */}
       <div className="w-full flex flex-col lg:grid lg:grid-cols-12 min-h-screen z-10">
-        
+
         {/* ========================================================
             LEFT COLUMN: BRAND SHOWCASE & SYSTEM MONITORING CONSOLE
             ======================================================== */}
         <div className="lg:col-span-7 p-6 sm:p-10 lg:p-14 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-slate-950/90 via-slate-900/90 to-[#002b18]/80 backdrop-blur-md border-b lg:border-b-0 lg:border-r border-slate-800/80">
-          
+
           {/* Subtle grid pattern background */}
-          <div 
+          <div
             className="absolute inset-0 opacity-[0.03] pointer-events-none"
             style={{
               backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
@@ -67,19 +67,17 @@ export default function LoginPage() {
           {/* Top Brand Header */}
           <div className="relative z-10">
             <Link to="/" className="inline-flex items-center gap-3.5 group">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-emerald-400 p-[1px] shadow-lg shadow-emerald-950/50">
-                <div className="w-full h-full bg-slate-950 rounded-2xl flex items-center justify-center text-emerald-400 font-black text-lg group-hover:bg-primary group-hover:text-white transition-all">
-                  VG
-                </div>
-              </div>
+              <img
+                src="/favicon.svg"
+                alt="Logo Pekon Margodadi"
+                className="w-11 h-11 object-contain drop-shadow-md group-hover:scale-105 transition-transform shrink-0"
+              />
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-white font-extrabold text-base sm:text-lg tracking-wide">
-                    Virtual Guide HITL
+                    Virtual Guide
                   </span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30">
-                    v2.0
-                  </span>
+
                 </div>
                 <p className="text-xs text-slate-400">Pemerintahan Pekon Margodadi</p>
               </div>
@@ -88,17 +86,12 @@ export default function LoginPage() {
 
           {/* Center Content & Value Proposition */}
           <div className="relative z-10 my-8 lg:my-0 max-w-xl space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-900/40 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Back-Office Management &amp; Monitoring Layer</span>
-            </div>
-
             <div className="space-y-3">
               <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
                 Pusat Kendali Pelayanan Cerdas &amp; Intervensi Manusia
               </h1>
               <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-                Platform monitoring real-time untuk aparatur desa dalam mengawasi percakapan warga, mengelola antrean <span className="text-emerald-400 font-semibold">Human-in-the-Loop (HITL)</span>, dan memperbarui basis pengetahuan AI Pekon Margodadi.
+                Platform monitoring real-time untuk aparatur desa dalam mengawasi percakapan warga, mengelola antrean <span className="text-emerald-400 font-semibold"></span>, dan memperbarui basis pengetahuan AI Pekon Margodadi.
               </p>
             </div>
 
@@ -134,7 +127,7 @@ export default function LoginPage() {
           <div className="relative z-10 pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-500 border-t border-slate-800/60">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-base text-emerald-500">verified</span>
-              <span>Sistem Terenkripsi &amp; Terproteksi Sanctum Auth</span>
+              <span>Sistem Terenkripsi &amp; Terproteksi</span>
             </div>
             <span>© 2026 Pekon Margodadi</span>
           </div>
@@ -145,7 +138,7 @@ export default function LoginPage() {
             ======================================================== */}
         <div className="lg:col-span-5 p-6 sm:p-10 lg:p-12 flex flex-col justify-center items-center bg-slate-900/50 backdrop-blur-xl">
           <div className="w-full max-w-md space-y-6">
-            
+
             {/* Header Login */}
             <div className="space-y-1.5 text-center sm:text-left">
               <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
@@ -158,7 +151,7 @@ export default function LoginPage() {
 
             {/* Main Form Card */}
             <div className="bg-slate-950/90 border border-slate-800/90 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5">
-              
+
               {/* Error Notification Alert */}
               {errorMessage && (
                 <div className="p-3.5 bg-rose-950/60 border border-rose-800/60 rounded-2xl text-xs text-rose-300 flex items-start gap-2.5 animate-in fade-in">

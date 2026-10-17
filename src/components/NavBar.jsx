@@ -110,25 +110,7 @@ export default function NavBar() {
               <span>Tanya Virtual Guide</span>
             </Link>
 
-            <Link
-              to="/admin"
-              onClick={closeMenu}
-              draggable={false}
-              onDragStart={(e) => e.preventDefault()}
-              className="flex items-center gap-2 pl-1 hover:opacity-90 cursor-pointer select-none"
-              title="Akses Portal Admin"
-            >
-              <img
-                alt="Profile"
-                draggable={false}
-                className="w-8 h-8 rounded-full object-cover ring-2 ring-emerald-500/20"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJiUP4EFFyg8VmjNLkwguRcXBjHsTg2Olj4mZ1siG7OraQdbZeP3aQwyjsFgIniDHuZbZ2obeUOt1VGMVYvAkw6RL938E_ITdYilQUixmB87yUPJan6gDJ8yU6ts9Yl6Fvk1MJaS4PFMyJ5zHMIpur7IAzzepXzed2D_jTV9B3KBewWmhCGQDQ3SUahhSze9_twdBPmGFXqpTYJSV0Jto8tAF22ainVvZiuUW81ZhoiX1WJTAw0r0"
-              />
-              <div className="hidden 2xl:flex flex-col text-left whitespace-nowrap">
-                <span className="text-xs font-semibold text-on-surface leading-tight">Dewi Lestari</span>
-                <span className="text-[11px] text-on-surface-variant leading-tight">Layanan Warga</span>
-              </div>
-            </Link>
+
 
             {/* Mobile menu toggle */}
             <button

@@ -99,9 +99,11 @@ export default function AdminSidebar({
         {/* 1. Brand Header (Fixed Top) */}
         <div className="h-16 shrink-0 flex items-center justify-between px-5 border-b border-slate-800/80 bg-slate-950/40">
           <Link to="/admin/dashboard" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center text-white font-black text-sm shadow-md shadow-primary/20 group-hover:scale-105 transition-transform">
-              VG
-            </div>
+            <img
+              src="/favicon.svg"
+              alt="Logo Pekon Margodadi"
+              className="w-9 h-9 object-contain drop-shadow-md group-hover:scale-105 transition-transform shrink-0"
+            />
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-extrabold text-sm text-white tracking-wide">
