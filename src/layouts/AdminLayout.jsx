@@ -4,6 +4,7 @@ import ScrollToTop from '../components/ScrollToTop'
 import AdminSidebar from '../components/admin/AdminSidebar'
 import { useAuth } from '../context/AuthContext'
 import conversationService from '../services/conversationService'
+import authService from '../services/authService'
 
 const PAGE_TITLES = {
   '/admin': 'Dashboard',
@@ -60,6 +61,25 @@ export default function AdminLayout() {
     return () => {
       isMounted = false
       clearInterval(interval)
+    }
+  }, [])
+
+  // Heartbeat berkala setiap 60 detik untuk menjaga status kehadiran operator (timeout 5 menit)
+  useEffect(() => {
+    let isMounted = true
+
+    // Kirim heartbeat saat layout admin dimuat
+    authService.heartbeat()
+
+    const heartbeatInterval = setInterval(() => {
+      if (isMounted) {
+        authService.heartbeat()
+      }
+    }, 60000)
+
+    return () => {
+      isMounted = false
+      clearInterval(heartbeatInterval)
     }
   }, [])
 

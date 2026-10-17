@@ -24,6 +24,15 @@ export const authService = {
       return { status: 'success' }
     }
   },
+
+  async heartbeat() {
+    try {
+      const response = await api.post('/auth/heartbeat')
+      return response.data
+    } catch {
+      return null
+    }
+  },
 }
 
 export default authService

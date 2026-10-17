@@ -92,9 +92,8 @@ export default function AdminSidebar({
 
       {/* Standalone Sidebar Container with Independent Fixed Height & Scroll */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 h-screen w-72 bg-slate-900 text-slate-200 flex flex-col shrink-0 shadow-2xl z-50 lg:z-30 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed lg:sticky top-0 left-0 h-screen w-72 bg-slate-900 text-slate-200 flex flex-col shrink-0 shadow-2xl z-50 lg:z-30 transition-transform duration-300 ease-in-out lg:translate-x-0 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         {/* 1. Brand Header (Fixed Top) */}
         <div className="h-16 shrink-0 flex items-center justify-between px-5 border-b border-slate-800/80 bg-slate-950/40">
@@ -107,13 +106,10 @@ export default function AdminSidebar({
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-extrabold text-sm text-white tracking-wide">
-                  Virtual Guide HITL
-                </span>
-                <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">
-                  v2.0
+                  Dashboard Layanan
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 font-medium">Pekon Margodadi Back-Office</p>
+              <p className="text-[11px] text-slate-400 font-medium">Pekon Margodadi</p>
             </div>
           </Link>
 
@@ -124,19 +120,6 @@ export default function AdminSidebar({
           >
             <span className="material-symbols-outlined text-xl">close</span>
           </button>
-        </div>
-
-        {/* 2. Authenticated Operator Role Tag (Fixed) */}
-        <div className="shrink-0 p-3 mx-3 mt-3 bg-slate-800/60 rounded-xl border border-slate-700/60 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-sm text-primary">verified_user</span>
-            <span className="text-xs font-bold text-slate-200">
-              {activeOperator.role === 'ADMIN' ? 'Administrator Pekon' : 'Operator Layanan'}
-            </span>
-          </div>
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">
-            Terautentikasi
-          </span>
         </div>
 
         {/* 3. Navigation Links (Independent Scroll Container) */}
@@ -152,10 +135,9 @@ export default function AdminSidebar({
               end={item.path === '/admin/dashboard'}
               onClick={() => setMobileMenuOpen(false)}
               className={({ isActive }) =>
-                `flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all ${
-                  isActive
-                    ? 'bg-primary text-white font-bold shadow-md shadow-primary/20'
-                    : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                `flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all ${isActive
+                  ? 'bg-primary text-white font-bold shadow-md shadow-primary/20'
+                  : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
                 }`
               }
             >

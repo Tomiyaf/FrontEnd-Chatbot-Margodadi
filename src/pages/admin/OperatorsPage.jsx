@@ -31,8 +31,33 @@ export default function OperatorsPage() {
     }
   }, [])
 
+  const formatRelativeTime = (dateString) => {
+    if (!dateString) return '-'
+    const date = new Date(dateString)
+    const diffSec = Math.floor((new Date() - date) / 1000)
+    if (diffSec < 60) return 'Baru saja'
+    const diffMin = Math.floor(diffSec / 60)
+    if (diffMin < 60) return `${diffMin} mnt lalu`
+    const diffHour = Math.floor(diffMin / 60)
+    if (diffHour < 24) return `${diffHour} jam lalu`
+    return `${Math.floor(diffHour / 24)} hari lalu`
+  }
+
   useEffect(() => {
     loadOperators()
+    // Auto-refresh background setiap 15 detik untuk memantau status online & timeout 5 menit
+    const interval = setInterval(() => {
+      operatorService
+        .getOperators()
+        .then((res) => {
+          if (res?.data) {
+            setOperators(res.data)
+          }
+        })
+        .catch(() => {})
+    }, 15000)
+
+    return () => clearInterval(interval)
   }, [loadOperators])
 
   const filteredOperators = operators.filter((op) => {
@@ -91,7 +116,16 @@ export default function OperatorsPage() {
     },
     {
       header: 'Status Kehadiran',
-      render: (row) => <StatusBadge status={row.status} />,
+      render: (row) => (
+        <div className="flex flex-col gap-0.5">
+          <StatusBadge status={row.status} />
+          {row.last_activity_at && (
+            <span className="text-[10px] text-slate-400">
+              {row.status === 'ONLINE' ? 'Aktif baru saja' : `Aktif: ${formatRelativeTime(row.last_activity_at)}`}
+            </span>
+          )}
+        </div>
+      ),
     },
     {
       header: 'Tugas Aktif',

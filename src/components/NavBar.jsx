@@ -15,38 +15,6 @@ export default function NavBar() {
 
   return (
     <header className="sticky top-0 w-full z-50 bg-white shadow-[0_1px_8px_rgba(0,0,0,0.06)] select-none">
-      {/* Top Announcement Bar */}
-      {/* <div className="bg-primary text-on-primary py-1 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="inline-flex items-center gap-1 bg-primary-fixed text-on-primary-fixed px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap shrink-0">
-              <span className="material-symbols-outlined text-sm leading-none">campaign</span>
-              PENGUMUMAN
-            </span>
-            <span className="text-xs text-on-primary/90 hidden sm:inline truncate">
-              Musrenbang Pekon Margodadi Tahun 2025 dibuka untuk aspirasi warga.
-            </span>
-          </div>
-          <div className="flex items-center gap-4 text-on-primary/90 text-xs ml-auto whitespace-nowrap shrink-0">
-            <div className="hidden md:flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-sm leading-none">schedule</span>
-              <span>Senin - Jumat: 08.00 - 15.30 WIB</span>
-            </div>
-            <a
-              className="inline-flex items-center gap-1 bg-tertiary text-on-tertiary hover:bg-tertiary-container px-2.5 py-1 rounded-full text-xs cursor-pointer select-none"
-              href="https://wa.me/6282177890112"
-              target="_blank"
-              rel="noopener noreferrer"
-              draggable={false}
-              onDragStart={(e) => e.preventDefault()}
-            >
-              <span className="material-symbols-outlined text-sm leading-none">chat</span>
-              <span>Hotline Pekon</span>
-            </a>
-          </div>
-        </div>
-      </div>*/}
-
       {/* Main Navigation Bar */}
       <div className="bg-white border-b border-surface-container-high/60">
         <div className="h-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
@@ -66,7 +34,7 @@ export default function NavBar() {
             />
             <div className="flex flex-col min-w-0">
               <span className="text-base sm:text-lg tracking-tight text-primary font-bold whitespace-nowrap leading-tight">
-                Virtual Guide
+                Layanan Cerdas
               </span>
               <span className="text-base sm:text-lg tracking-tight text-primary font-bold whitespace-nowrap leading-tight">
                 Pekon Margodadi
@@ -85,10 +53,9 @@ export default function NavBar() {
                 draggable={false}
                 onDragStart={(e) => e.preventDefault()}
                 className={({ isActive }) =>
-                  `px-3.5 py-2 rounded-lg text-sm font-semibold whitespace-nowrap cursor-pointer select-none ${
-                    isActive
-                      ? 'bg-primary-container text-on-primary shadow-2xs'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                  `px-3.5 py-2 rounded-lg text-sm font-semibold whitespace-nowrap cursor-pointer select-none ${isActive
+                    ? 'bg-primary-container text-on-primary shadow-2xs'
+                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
                   }`
                 }
               >
@@ -107,10 +74,8 @@ export default function NavBar() {
               className="inline-flex items-center gap-2 bg-primary hover:bg-primary-container text-on-primary px-3.5 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold shadow-xs whitespace-nowrap cursor-pointer select-none"
             >
               <span className="material-symbols-outlined text-lg leading-none">smart_toy</span>
-              <span>Tanya Virtual Guide</span>
+              <span>Tanya disini</span>
             </Link>
-
-
 
             {/* Mobile menu toggle */}
             <button
@@ -139,10 +104,9 @@ export default function NavBar() {
                   draggable={false}
                   onDragStart={(e) => e.preventDefault()}
                   className={({ isActive }) =>
-                    `px-3.5 py-2.5 rounded-lg text-sm font-semibold whitespace-nowrap cursor-pointer select-none ${
-                      isActive
-                        ? 'bg-primary-container text-on-primary'
-                        : 'text-on-surface-variant hover:bg-surface-container'
+                    `px-3.5 py-2.5 rounded-lg text-sm font-semibold whitespace-nowrap cursor-pointer select-none ${isActive
+                      ? 'bg-primary-container text-on-primary'
+                      : 'text-on-surface-variant hover:bg-surface-container'
                     }`
                   }
                 >
