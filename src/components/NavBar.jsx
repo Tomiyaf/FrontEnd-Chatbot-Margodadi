@@ -62,7 +62,7 @@ export default function NavBar() {
               alt="Logo Pekon Margodadi"
               className="h-10 w-auto object-contain shrink-0"
               draggable={false}
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPe1K5bFZag-QlGF_nAYci7bYZJVVtbJ-RT5pVN18dDJE_oY4Oz2b7UDOIbqnagbLxUivEV8Nor8IX6D-NMIgrINsXIvhw4EDkZe5NWj3gjlHinh6XOyjGoLaJlBrosZYXQoeUCYJqSs8k3q-jawedVUm6YE01bMTD1qiL4wcT2_Vs7252HBzk4ir_AMJvKshNatdiv0ZnJPblKLE-JNJv4OQhqUGCFB_bV5UnGDuHTjjbVxSxCjM"
+              src="/favicon.svg"
             />
             <div className="flex flex-col min-w-0">
               <span className="text-base sm:text-lg tracking-tight text-primary font-bold whitespace-nowrap leading-tight">

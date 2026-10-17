@@ -166,7 +166,7 @@ export default function UmkmFormModal({
 
       setPhone('')
       setWaNumber('')
-      setAddress('Pekon Margodadi, Sumberejo, Tanggamus')
+      setAddress('Margodadi, Kec. Ambarawa, Kabupaten Pringsewu, Lampung 35376')
       setMapTitle('')
       setMapUrl('')
 

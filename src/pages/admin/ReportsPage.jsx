@@ -188,7 +188,7 @@ export default function ReportsPage() {
                 Pemerintah Pekon Margodadi
               </h2>
               <p className="text-xs text-slate-600">
-                Kecamatan Sumberejo, Kabupaten Tanggamus, Lampung
+                Kecamatan Ambarawa, Kabupaten Pringsewu, Lampung
               </p>
               <p className="text-[11px] text-slate-400 font-mono">
                 Laporan Kinerja Layanan Digital & Virtual Guide (Sistem Informasi Pekon)

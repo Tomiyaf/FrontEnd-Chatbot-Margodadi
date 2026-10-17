@@ -11,14 +11,14 @@ export default function Footer() {
               <img
                 alt="Logo Pekon Margodadi"
                 className="h-9 w-auto object-contain"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPe1K5bFZag-QlGF_nAYci7bYZJVVtbJ-RT5pVN18dDJE_oY4Oz2b7UDOIbqnagbLxUivEV8Nor8IX6D-NMIgrINsXIvhw4EDkZe5NWj3gjlHinh6XOyjGoLaJlBrosZYXQoeUCYJqSs8k3q-jawedVUm6YE01bMTD1qiL4wcT2_Vs7252HBzk4ir_AMJvKshNatdiv0ZnJPblKLE-JNJv4OQhqUGCFB_bV5UnGDuHTjjbVxSxCjM"
+                src="/favicon.svg"
               />
               <div className="flex flex-col">
                 <span className="text-base font-bold text-primary tracking-tight">
                   PEKON MARGODADI
                 </span>
                 <span className="text-xs text-on-surface-variant">
-                  Kec. Sumberejo, Kab. Tanggamus, Lampung
+                  Kec. Ambarawa, Kab. Pringsewu, Lampung
                 </span>
               </div>
             </div>
@@ -47,7 +47,7 @@ export default function Footer() {
                   location_on
                 </span>
                 <span>
-                  Jl. Raya Margodadi No. 01, Pekon Margodadi, Kecamatan Sumberejo, Kabupaten Tanggamus, Lampung 35374
+                  Margodadi, Kec. Ambarawa, Kabupaten Pringsewu, Lampung 35376
                 </span>
               </div>
               <div className="flex items-start gap-2">

@@ -1,10 +1,72 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import heroBg from '../../assets/hero-bg.jpg'
+import publicService from '../../services/publicService'
+import LazyImage from '../../components/common/LazyImage'
+import UmkmDetailModal from '../../components/umkm/UmkmDetailModal'
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('')
+  const [umkmList, setUmkmList] = useState([])
+  const [totalUmkm, setTotalUmkm] = useState(0)
+  const [umkmLoading, setUmkmLoading] = useState(true)
+  const [selectedUmkmModal, setSelectedUmkmModal] = useState(null)
+  const [servicesList, setServicesList] = useState([])
+  const [servicesLoading, setServicesLoading] = useState(true)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    let isMounted = true
+
+    // Fetch UMKM dari database
+    publicService
+      .getUmkms({ sort: 'popular' })
+      .then((res) => {
+        if (isMounted && res?.data?.umkms) {
+          setUmkmList(res.data.umkms)
+          setTotalUmkm(res.data.umkms.length)
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load featured UMKMs from DB:', err)
+      })
+      .finally(() => {
+        if (isMounted) setUmkmLoading(false)
+      })
+
+    // Fetch Layanan Publik Populer dari database
+    publicService
+      .getPublicServices()
+      .then((res) => {
+        if (isMounted && res?.data?.services) {
+          setServicesList(res.data.services)
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load public services from DB:', err)
+      })
+      .finally(() => {
+        if (isMounted) setServicesLoading(false)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setSelectedUmkmModal(null)
+      }
+    }
+    if (selectedUmkmModal) {
+      window.addEventListener('keydown', handleKeyDown)
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [selectedUmkmModal])
 
   const popularSearches = [
     'Surat Pengantar SKTM',
@@ -259,68 +321,69 @@ export default function HomePage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {/* SKU */}
-                  <div className="bg-surface-container-low p-5 rounded-2xl flex flex-col justify-between hover:bg-surface-container transition-colors border border-surface-container-high/30">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="w-8 h-8 rounded-lg bg-surface-container-high text-primary flex items-center justify-center font-bold text-xs">
-                          01
-                        </span>
+                  {servicesLoading ? (
+                    [1, 2, 3].map((n) => (
+                      <div
+                        key={n}
+                        className="bg-surface-container-low p-5 rounded-2xl flex flex-col justify-between border border-surface-container-high/30 animate-pulse space-y-3"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-surface-container-high" />
+                        <div className="h-4 bg-surface-container-high rounded w-3/4" />
+                        <div className="space-y-1">
+                          <div className="h-3 bg-surface-container-high rounded w-1/2" />
+                          <div className="h-3 bg-surface-container-high rounded w-full" />
+                          <div className="h-3 bg-surface-container-high rounded w-4/5" />
+                        </div>
                       </div>
-                      <h3 className="text-sm font-bold text-on-surface">Surat Keterangan Usaha (SKU)</h3>
-                      <div className="text-xs text-on-surface-variant space-y-1">
-                        <p className="font-semibold text-on-surface">Syarat Berkas:</p>
-                        <ul className="list-disc list-inside space-y-0.5 text-[11px]">
-                          <li>Pengantar RT setempat</li>
-                          <li>Fotokopi KTP Pemohon</li>
-                          <li>Fotokopi Kartu Keluarga</li>
-                          <li>Foto Lokasi/Aktivitas Usaha</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* SKTM */}
-                  <div className="bg-surface-container-low p-5 rounded-2xl flex flex-col justify-between hover:bg-surface-container transition-colors border border-surface-container-high/30">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="w-8 h-8 rounded-lg bg-surface-container-high text-primary flex items-center justify-center font-bold text-xs">
-                          02
-                        </span>
-                      </div>
-                      <h3 className="text-sm font-bold text-on-surface">Keterangan Tidak Mampu (SKTM)</h3>
-                      <div className="text-xs text-on-surface-variant space-y-1">
-                        <p className="font-semibold text-on-surface">Syarat Berkas:</p>
-                        <ul className="list-disc list-inside space-y-0.5 text-[11px]">
-                          <li>Surat Pengantar RT/RW</li>
-                          <li>KTP asli &amp; Fotokopi</li>
-                          <li>Kartu Keluarga asli &amp; FC</li>
-                          <li>Surat Pernyataan Bermaterai</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Pengantar Nikah (N1-N4) */}
-                  <div className="bg-surface-container-low p-5 rounded-2xl flex flex-col justify-between hover:bg-surface-container transition-colors border border-surface-container-high/30">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="w-8 h-8 rounded-lg bg-surface-container-high text-primary flex items-center justify-center font-bold text-xs">
-                          03
-                        </span>
-                      </div>
-                      <h3 className="text-sm font-bold text-on-surface">Surat Pengantar Nikah (N1-N4)</h3>
-                      <div className="text-xs text-on-surface-variant space-y-1">
-                        <p className="font-semibold text-on-surface">Syarat Berkas:</p>
-                        <ul className="list-disc list-inside space-y-0.5 text-[11px]">
-                          <li>Pengantar RT Calon Pengantin</li>
-                          <li>FC KTP &amp; Akta Kelahiran</li>
-                          <li>Pas Foto Berlatar Biru</li>
-                          <li>FC Ijazah Terakhir</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
+                    ))
+                  ) : servicesList.length > 0 ? (
+                    servicesList.slice(0, 3).map((service, idx) => {
+                      const reqs = Array.isArray(service.requirements)
+                        ? service.requirements
+                        : []
+                      return (
+                        <Link
+                          key={service.id || service.service_id || idx}
+                          to="/layanan-publik"
+                          className="bg-surface-container-low p-5 rounded-2xl flex flex-col justify-between hover:bg-surface-container hover:shadow-md transition-all border border-surface-container-high/30 group cursor-pointer"
+                        >
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="w-8 h-8 rounded-lg bg-surface-container-high text-primary flex items-center justify-center font-bold text-xs group-hover:bg-primary group-hover:text-white transition-colors">
+                                {String(idx + 1).padStart(2, '0')}
+                              </span>
+                              <span className="text-[10px] font-semibold text-primary px-2 py-0.5 rounded-full bg-primary/10">
+                                {service.duration || '1 Hari Kerja'}
+                              </span>
+                            </div>
+                            <h3 className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors line-clamp-2">
+                              {service.title}
+                            </h3>
+                            <div className="text-xs text-on-surface-variant space-y-1">
+                              <p className="font-semibold text-on-surface">Syarat Berkas:</p>
+                              <ul className="list-disc list-inside space-y-0.5 text-[11px] line-clamp-4">
+                                {reqs.length > 0 ? (
+                                  reqs.slice(0, 4).map((r, ri) => (
+                                    <li key={ri} className="truncate">
+                                      {typeof r === 'string' ? r : r.title || r.name}
+                                    </li>
+                                  ))
+                                ) : (
+                                  <li>KTP &amp; Kartu Keluarga pemohon</li>
+                                )}
+                              </ul>
+                            </div>
+                          </div>
+                          <div className="pt-3 border-t border-surface-container-high/50 flex items-center justify-between text-[11px] text-primary font-semibold mt-3">
+                            <span>{service.cost || 'Gratis (Rp 0)'}</span>
+                            <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">
+                              arrow_forward
+                            </span>
+                          </div>
+                        </Link>
+                      )
+                    })
+                  ) : null}
                 </div>
               </div>
 
@@ -388,138 +451,112 @@ export default function HomePage() {
               to="/potensi-umkm"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary-container text-on-secondary text-xs font-semibold hover:bg-secondary transition-colors shadow-xs"
             >
-              <span>Lihat Semua 28 UMKM Terdaftar</span>
+              <span>
+                {totalUmkm > 0
+                  ? `Lihat Semua ${totalUmkm} UMKM Terdaftar`
+                  : 'Lihat Semua Katalog UMKM'}
+              </span>
               <span className="material-symbols-outlined text-base">arrow_forward</span>
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* UMKM 1: Kopi Robusta */}
-            <div className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col border border-surface-container-high/40">
-              <div className="relative h-52 w-full overflow-hidden">
-                <img
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                  alt="Kopi Robusta Lereng Margodadi"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLYiRZs5u89xiYv7a0gNwZ46x_6ifrfTFM8FmrebML_CVaIRUdpgCRPhVz1gb92_vfsKWrKKi1OFruRjTC_DgNUgPOuETnW8pgeqO5tSatezu0EdaDTOXRsNxrFOk2ok9Y223S0IUQgXaBkcrVN9Ki90nyxch_6MEEfOsoDynMi43Bi1yT07NllFd4LZmVr2eafl0KICODE_Sa-Qw5Pd_eL3VPoYJKYcrITlzz0BMC4Vqk_Xw-ACk"
-                />
-                <div className="absolute top-3 left-3 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-primary flex items-center gap-1 shadow-xs">
-                  <span className="material-symbols-outlined text-xs">verified</span> Komoditas Tani
-                </div>
-                <div className="absolute bottom-3 right-3 bg-primary text-on-primary px-3 py-1 rounded-lg text-xs font-bold shadow-sm">
-                  Rp 35.000 / 250gr
-                </div>
-              </div>
-              <div className="p-6 flex flex-col justify-between flex-1 space-y-4">
-                <div>
-                  <div className="flex items-center gap-2 text-xs text-on-surface-variant mb-1">
-                    <span className="material-symbols-outlined text-sm text-secondary">person</span>
-                    <span>Pak Supardi (Dusun 02 Margodadi)</span>
+          {umkmLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[1, 2, 3].map((n) => (
+                <div
+                  key={n}
+                  className="bg-surface-container-lowest rounded-2xl overflow-hidden border border-surface-container-high/40 animate-pulse"
+                >
+                  <div className="h-52 bg-slate-200" />
+                  <div className="p-6 space-y-3">
+                    <div className="h-4 bg-slate-200 rounded w-1/3" />
+                    <div className="h-5 bg-slate-200 rounded w-3/4" />
+                    <div className="h-12 bg-slate-100 rounded" />
+                    <div className="h-8 bg-slate-200 rounded mt-4" />
                   </div>
-                  <h3 className="text-base font-bold text-on-surface">Kopi Robusta Lereng Margodadi</h3>
-                  <p className="text-xs text-on-surface-variant mt-2 line-clamp-2 leading-relaxed">
-                    Biji kopi pilihan petik merah dari lereng Sumberejo, diproses natural wash dengan aroma cokelat karamel khas Tanggamus.
-                  </p>
                 </div>
-                <div className="pt-4 border-t border-surface-container flex items-center justify-between">
-                  <span className="text-xs font-semibold text-primary flex items-center gap-1">
-                    <span className="material-symbols-outlined text-sm">store</span> Kios Tani Berkah
-                  </span>
-                  <a
-                    className="inline-flex items-center gap-1 bg-primary text-on-primary hover:bg-primary-container px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors"
-                    href="https://wa.me/6282177890112"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <span className="material-symbols-outlined text-sm">chat</span> Hubungi Penjual
-                  </a>
-                </div>
-              </div>
+              ))}
             </div>
+          ) : umkmList.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {umkmList.slice(0, 3).map((item) => {
+                const firstProduct = item.featuredProducts?.[0]
+                const price = firstProduct?.price || 'Hubungi Penjual'
+                const waLink = item.waNumber
+                  ? `https://wa.me/${String(item.waNumber).replace(/[^0-9]/g, '')}`
+                  : item.phone
+                  ? `https://wa.me/${String(item.phone).replace(/[^0-9]/g, '')}`
+                  : 'https://wa.me/6282177890112'
 
-            {/* UMKM 2: Kerajinan Anyaman Bambu */}
-            <div className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col border border-surface-container-high/40">
-              <div className="relative h-52 w-full overflow-hidden">
-                <img
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                  alt="Kerajinan Anyaman Bambu Lestari"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3wZbIWqeJU5IKlU7_iLqIIsVX1sjZITHlmytTwudTQFiFTcTRPkF3PDr_wPIb-YDAOtKzSbIC6xDCrwY-aocNU7K3gAJPUwOp9JbUIczb1VOnj71I9QbL1MliY0q-p7XPV8u5kMDwQpnD1wxfksec9zxVNqRnS2hAERZbJFXtezycjlRndKF0WiGVLzV6B_7L57ptPw_zeFR1kH_b9dVTTUJNI4rn_Mf-NhvxxmNGbuT3nvMiCx0"
-                />
-                <div className="absolute top-3 left-3 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-secondary flex items-center gap-1 shadow-xs">
-                  <span className="material-symbols-outlined text-xs">palette</span> Kriya Kreatif
-                </div>
-                <div className="absolute bottom-3 right-3 bg-primary text-on-primary px-3 py-1 rounded-lg text-xs font-bold shadow-sm">
-                  Mulai Rp 25.000
-                </div>
-              </div>
-              <div className="p-6 flex flex-col justify-between flex-1 space-y-4">
-                <div>
-                  <div className="flex items-center gap-2 text-xs text-on-surface-variant mb-1">
-                    <span className="material-symbols-outlined text-sm text-secondary">person</span>
-                    <span>Ibu Sri Utami (Kelompok Wanita Tani)</span>
-                  </div>
-                  <h3 className="text-base font-bold text-on-surface">Kerajinan Anyaman Bambu Lestari</h3>
-                  <p className="text-xs text-on-surface-variant mt-2 line-clamp-2 leading-relaxed">
-                    Produk anyaman bambu ramah lingkungan, wadah serbaguna, besek hampers, dan tudung saji tahan lama berstandar ekspor lokal.
-                  </p>
-                </div>
-                <div className="pt-4 border-t border-surface-container flex items-center justify-between">
-                  <span className="text-xs font-semibold text-primary flex items-center gap-1">
-                    <span className="material-symbols-outlined text-sm">inventory_2</span> Siap Kirim
-                  </span>
-                  <a
-                    className="inline-flex items-center gap-1 bg-primary text-on-primary hover:bg-primary-container px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors"
-                    href="https://wa.me/6282177890112"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                return (
+                  <div
+                    key={item.id}
+                    className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col border border-surface-container-high/40 group"
                   >
-                    <span className="material-symbols-outlined text-sm">chat</span> Hubungi Penjual
-                  </a>
-                </div>
-              </div>
-            </div>
+                    <div className="relative h-52 w-full overflow-hidden bg-surface-container">
+                      <LazyImage
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        alt={item.name}
+                        src={item.image}
+                      />
+                      <div className="absolute top-3 left-3 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-primary flex items-center gap-1 shadow-xs z-10">
+                        <span className="material-symbols-outlined text-xs">verified</span>{' '}
+                        {item.categoryBadge || 'UMKM Desa'}
+                      </div>
+                      <div className="absolute bottom-3 right-3 bg-primary text-on-primary px-3 py-1 rounded-lg text-xs font-bold shadow-sm z-10">
+                        {price}
+                      </div>
+                    </div>
 
-            {/* UMKM 3: Keripik Pisang Tanduk */}
-            <div className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all flex flex-col border border-surface-container-high/40">
-              <div className="relative h-52 w-full overflow-hidden">
-                <img
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                  alt="Keripik Pisang Tanduk Barokah"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBORFVh5vMITHkgWKaRAmEk8xIC9Hj-fnAEzGFcH21MOTuAf0Q4ZeXqe65WSANXtrzVFZ8Mo85mommkuLv3eojxtY1KOElkEu4hfgtbBt5Y-gnuN-PfPXFB6Mdsnkkm-9ub2CVB1-7iMGPqqqHnEujYpbVTShFjYsxYkm0tQfQd26U5UyeGiiWTOQS2d5hdoIS0gt_iPKkbUIdAPWtgl7kQVUDlo23KMdBHNcXFHBlRUAan0vlsnts"
-                />
-                <div className="absolute top-3 left-3 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-tertiary flex items-center gap-1 shadow-xs">
-                  <span className="material-symbols-outlined text-xs">lunch_dining</span> Kuliner
-                </div>
-                <div className="absolute bottom-3 right-3 bg-primary text-on-primary px-3 py-1 rounded-lg text-xs font-bold shadow-sm">
-                  Rp 18.000 / bks
-                </div>
-              </div>
-              <div className="p-6 flex flex-col justify-between flex-1 space-y-4">
-                <div>
-                  <div className="flex items-center gap-2 text-xs text-on-surface-variant mb-1">
-                    <span className="material-symbols-outlined text-sm text-secondary">person</span>
-                    <span>Ibu Siti Rahayu (Dusun 01)</span>
+                    <div className="p-6 flex flex-col justify-between flex-1 space-y-4">
+                      <div>
+                        <div className="flex items-center gap-2 text-xs text-on-surface-variant mb-1">
+                          <span className="material-symbols-outlined text-sm text-secondary">person</span>
+                          <span>
+                            {item.owner} {item.address ? `(${item.address})` : ''}
+                          </span>
+                        </div>
+                        <h3 className="text-base font-bold text-on-surface group-hover:text-primary transition-colors line-clamp-1">
+                          {item.name}
+                        </h3>
+                        <p className="text-xs text-on-surface-variant mt-2 line-clamp-2 leading-relaxed">
+                          {item.description}
+                        </p>
+                      </div>
+
+                      <div className="pt-4 border-t border-surface-container flex items-center justify-between gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedUmkmModal(item)}
+                          className="text-xs font-semibold text-primary hover:text-primary-container flex items-center gap-1 cursor-pointer transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-sm">visibility</span>
+                          <span>Detail Profil</span>
+                        </button>
+                        <a
+                          className="inline-flex items-center gap-1 bg-primary text-on-primary hover:bg-primary-container px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors shrink-0 shadow-2xs"
+                          href={waLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <span className="material-symbols-outlined text-sm">chat</span>{' '}
+                          <span>Hubungi Penjual</span>
+                        </a>
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="text-base font-bold text-on-surface">Keripik Pisang Tanduk Barokah</h3>
-                  <p className="text-xs text-on-surface-variant mt-2 line-clamp-2 leading-relaxed">
-                    Oleh-oleh khas desa dari pisang tanduk kebun pekon murni, renyah tanpa pengawet dengan pilihan rasa gurih dan cokelat lumer.
-                  </p>
-                </div>
-                <div className="pt-4 border-t border-surface-container flex items-center justify-between">
-                  <span className="text-xs font-semibold text-primary flex items-center gap-1">
-                    <span className="material-symbols-outlined text-sm">verified</span> PIRT &amp; Halal
-                  </span>
-                  <a
-                    className="inline-flex items-center gap-1 bg-primary text-on-primary hover:bg-primary-container px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors"
-                    href="https://wa.me/6282177890112"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <span className="material-symbols-outlined text-sm">chat</span> Hubungi Penjual
-                  </a>
-                </div>
-              </div>
+                )
+              })}
             </div>
-          </div>
+          ) : (
+            <div className="text-center py-12 bg-surface-container-low rounded-2xl border border-surface-container-high/40">
+              <span className="material-symbols-outlined text-4xl text-outline mb-2">storefront</span>
+              <p className="text-sm font-semibold text-on-surface">Belum ada UMKM yang terdaftar</p>
+              <p className="text-xs text-on-surface-variant mt-1">
+                Data UMKM desa akan segera diperbarui melalui sistem.
+              </p>
+            </div>
+          )}
         </section>
 
         {/* 5. SOROTAN EDUKASI SAMPAH & BANK SAMPAH BERKAH */}
@@ -575,7 +612,7 @@ export default function HomePage() {
                       Kantor Kepala Pekon Margodadi
                     </span>
                     <span className="text-[11px] max-w-xs text-on-surface-variant">
-                      Kecamatan Sumberejo, Kabupaten Tanggamus, Provinsi Lampung 35374
+                      Margodadi, Kec. Ambarawa, Kabupaten Pringsewu, Lampung 35376
                     </span>
                   </div>
                 </div>
@@ -589,6 +626,13 @@ export default function HomePage() {
         </section>
         */}
       </div>
+
+      {/* Modal Detail Profil UMKM */}
+      <UmkmDetailModal
+        isOpen={Boolean(selectedUmkmModal)}
+        onClose={() => setSelectedUmkmModal(null)}
+        umkm={selectedUmkmModal}
+      />
     </div>
   )
 }
