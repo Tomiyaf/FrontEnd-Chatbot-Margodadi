@@ -26,6 +26,7 @@ const AnalyticsPage = lazy(() => import('../pages/admin/AnalyticsPage'))
 const EducationPage = lazy(() => import('../pages/admin/EducationPage'))
 const ReportsPage = lazy(() => import('../pages/admin/ReportsPage'))
 const KnowledgeBasePage = lazy(() => import('../pages/admin/KnowledgeBasePage'))
+const UmkmManagementPage = lazy(() => import('../pages/admin/UmkmManagementPage'))
 const ActivityLogPage = lazy(() => import('../pages/admin/ActivityLogPage'))
 const SettingsPage = lazy(() => import('../pages/admin/SettingsPage'))
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'))
@@ -135,6 +136,10 @@ export const router = createBrowserRouter([
           {
             path: 'knowledge-base',
             element: withSuspense(KnowledgeBasePage, 'Menghubungkan AI Vector Store...'),
+          },
+          {
+            path: 'umkm',
+            element: withSuspense(UmkmManagementPage, 'Memuat Manajemen Potensi UMKM...'),
           },
           {
             path: 'research-export',

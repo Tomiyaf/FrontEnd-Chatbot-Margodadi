@@ -56,6 +56,12 @@ export default function AdminSidebar({
       roles: ['ADMIN'],
     },
     {
+      label: 'Potensi UMKM',
+      path: '/admin/umkm',
+      icon: 'storefront',
+      roles: ['ADMIN', 'OPERATOR'],
+    },
+    {
       label: 'Activity Log',
       path: '/admin/activity-log',
       icon: 'history',

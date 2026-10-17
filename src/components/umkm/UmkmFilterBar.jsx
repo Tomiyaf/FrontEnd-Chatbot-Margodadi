@@ -9,14 +9,15 @@ export default function UmkmFilterBar({
   onSortChange,
   categories,
 }) {
-  const getCategoryIcon = (catId) => {
-    switch (catId) {
-      case 'kuliner': return 'restaurant'
-      case 'kerajinan': return 'palette'
-      case 'pertanian': return 'agriculture'
-      case 'jasa': return 'handyman'
-      default: return 'apps'
-    }
+  const getCategoryIcon = (cat) => {
+    if (!cat || cat.id === 'all') return 'apps'
+    const slug = (cat.slug || cat.id || '').toLowerCase()
+    const name = (cat.name || '').toLowerCase()
+    if (slug.includes('kuliner') || name.includes('kuliner') || name.includes('pangan') || name.includes('makan')) return 'restaurant'
+    if (slug.includes('kerajinan') || name.includes('kerajinan') || name.includes('kriya') || name.includes('kreatif')) return 'palette'
+    if (slug.includes('tani') || slug.includes('pertanian') || name.includes('tani') || name.includes('kebun') || name.includes('bumi')) return 'agriculture'
+    if (slug.includes('jasa') || name.includes('jasa') || name.includes('dagang')) return 'handyman'
+    return 'storefront'
   }
 
   return (
@@ -48,7 +49,7 @@ export default function UmkmFilterBar({
                   : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant'
               }`}
             >
-              <span className="material-symbols-outlined text-sm">{getCategoryIcon(cat.id)}</span>
+              <span className="material-symbols-outlined text-sm">{getCategoryIcon(cat)}</span>
               <span>{cat.name}</span>
               <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
                 selectedCategory === cat.id ? 'bg-white/20 text-white' : 'bg-surface-container-highest text-on-surface-variant'

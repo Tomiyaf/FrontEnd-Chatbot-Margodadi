@@ -11,13 +11,20 @@ export const api = axios.create({
   },
 })
 
-// Request Interceptor: Attach Sanctum Bearer Token
+// Request Interceptor: Attach Sanctum Bearer Token and handle FormData
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('vg_token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
+
+    // Crucial for FormData file uploads: let browser/axios generate multipart boundary automatically
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type']
+      delete config.headers['content-type']
+    }
+
     return config
   },
   (error) => Promise.reject(error)

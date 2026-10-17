@@ -14,6 +14,7 @@ const PAGE_TITLES = {
   '/admin/education': 'Monitoring Edukasi',
   '/admin/reports': 'Laporan Layanan',
   '/admin/knowledge-base': 'Knowledge Base & Vektor AI',
+  '/admin/umkm': 'Manajemen Potensi UMKM',
   '/admin/activity-log': 'Activity Log',
   '/admin/settings': 'Pengaturan Sistem',
 }
