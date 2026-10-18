@@ -38,7 +38,6 @@ export default function TanyaVirtualGuidePage() {
 
   const [isTyping, setIsTyping] = useState(false)
   const [isVoiceActive, setIsVoiceActive] = useState(false)
-  const [feedbackGiven, setFeedbackGiven] = useState({})
   const [toastMessage, setToastMessage] = useState(null)
 
   // Drawer & Modal States
@@ -194,23 +193,7 @@ export default function TanyaVirtualGuidePage() {
       localStorage.setItem('vg_public_session', newSessionId)
       setSessionId(newSessionId)
       setMessages(initialMessages)
-      setFeedbackGiven({})
       showToast('Sesi percakapan baru telah dimulai.')
-    }
-  }
-
-  const handleFeedback = async (messageId, type) => {
-    setFeedbackGiven((prev) => ({ ...prev, [messageId]: type }))
-    showToast(type === 'positive' ? 'Terima kasih atas ulasan positif Anda!' : 'Terima kasih atas masukan Anda.')
-    try {
-      await chatbotService.submitFeedback({
-        message_id: messageId,
-        type: type,
-        session_id: sessionId || undefined,
-        conversation_id: conversationId || undefined,
-      })
-    } catch (err) {
-      console.warn('Gagal menyimpan feedback respon AI:', err)
     }
   }
 
@@ -241,16 +224,21 @@ export default function TanyaVirtualGuidePage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] max-w-5xl mx-auto w-full px-2 sm:px-4 py-2 sm:py-4">
+    <div className="relative flex flex-col h-full max-w-5xl mx-auto w-full px-0 sm:px-4 py-0 sm:py-4 min-h-0">
+      {/* Decorative Ambient Background Glows */}
+      <div className="absolute top-12 -left-16 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+      <div className="absolute bottom-16 -right-16 w-80 h-80 bg-secondary/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[350px] bg-primary-fixed/20 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+
       {/* Toast Alert */}
       {toastMessage && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-2xl shadow-xl text-xs sm:text-sm font-medium animate-in fade-in">
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 backdrop-blur-md text-white px-4 py-2.5 rounded-2xl shadow-xl text-xs sm:text-sm font-medium animate-in fade-in">
           {toastMessage}
         </div>
       )}
 
       {/* Main Chat Shell Container */}
-      <div className="flex-1 flex flex-col bg-white rounded-3xl border border-slate-200/80 shadow-md overflow-hidden">
+      <div className="flex-1 flex flex-col bg-white/95 backdrop-blur-md rounded-none sm:rounded-3xl border-0 sm:border border-surface-container-high/80 shadow-xl overflow-hidden ring-0 sm:ring-1 sm:ring-black/5 min-h-0">
         {/* 1. Header */}
         <ChatHeader
           anonymousCode={anonymousCode}
@@ -264,8 +252,6 @@ export default function TanyaVirtualGuidePage() {
           ref={dialogueContainerRef}
           messages={messages}
           isTyping={isTyping}
-          feedbackGiven={feedbackGiven}
-          onFeedback={handleFeedback}
           onViewCitation={handleViewCitation}
           onChipClick={(chipPrompt) => handleSend(chipPrompt)}
         />
