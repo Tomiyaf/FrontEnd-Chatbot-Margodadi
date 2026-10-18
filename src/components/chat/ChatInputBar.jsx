@@ -12,7 +12,7 @@ export default function ChatInputBar({
   const quickSuggestions = [
     { label: 'Syarat Surat Domisili', prompt: 'Bagaimana syarat dan cara membuat surat keterangan domisili di Pekon Margodadi?' },
     { label: 'Katalog UMKM Kopi', prompt: 'Saya ingin tahu daftar produk UMKM olahan kopi robusta unggulan desa.' },
-    { label: 'Jadwal Bank Sampah', prompt: 'Bagaimana alur dan jadwal penyetoran sampah anorganik ke Bank Sampah Margodadi?' },
+    { label: 'Pengajuan SKTM', prompt: 'Bagaimana syarat dan alur pembuatan Surat Keterangan Tidak Mampu (SKTM)?' },
     { label: 'Surat Izin Usaha Mikro', prompt: 'Apa saja berkas yang harus disiapkan untuk permohonan Surat Keterangan Usaha (SKU)?' },
   ]
 
@@ -69,7 +69,7 @@ export default function ChatInputBar({
           value={inputText}
           onChange={onInputChange}
           onKeyDown={handleKeyDown}
-          placeholder="Ketik pertanyaan terkait administrasi desa, UMKM, atau pilah sampah (tekan Enter untuk kirim)..."
+          placeholder="Ketik pertanyaan terkait administrasi surat atau produk UMKM (tekan Enter untuk kirim)..."
           className="flex-1 bg-transparent border-0 resize-none text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none max-h-28 py-1.5 px-1 leading-relaxed"
         />
 

@@ -12,7 +12,6 @@ const PAGE_TITLES = {
   '/admin/conversations': 'Percakapan (Inbox)',
   '/admin/operators': 'Manajemen Operator',
   '/admin/analytics': 'Analitik Layanan',
-  '/admin/education': 'Monitoring Edukasi',
   '/admin/reports': 'Laporan Layanan',
   '/admin/knowledge-base': 'Knowledge Base & Vektor AI',
   '/admin/umkm': 'Manajemen Potensi UMKM',

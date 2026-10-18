@@ -20,7 +20,7 @@ export default function KnowledgeBasePage() {
     active_documents: 0,
     total_chunks: 0,
     avg_chunks_per_doc: 0,
-    domain_breakdown: { PUBLIC_SERVICE: 0, UMKM: 0, WASTE_EDUCATION: 0 },
+    domain_breakdown: { PUBLIC_SERVICE: 0, UMKM: 0 },
     embedding_model: 'text-embedding-3-small',
     llm_model: 'gpt-4o-mini',
     chunk_size: 500,

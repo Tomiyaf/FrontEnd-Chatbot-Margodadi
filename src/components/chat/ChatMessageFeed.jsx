@@ -24,7 +24,7 @@ const ChatMessageFeed = forwardRef(function ChatMessageFeed(
         </div>
         <h2 className="text-sm font-bold text-slate-900">Virtual Guide Resmi Pekon Margodadi</h2>
         <p className="text-xs text-slate-500 leading-relaxed">
-          Tanyakan syarat pembuatan surat (Domisili, Keterangan Usaha, NA), informasi katalog UMKM desa, atau edukasi pilah sampah 3R. Jika sistem membutuhkan verifikasi khusus, aparatur pekon akan langsung memandu percakapan Anda.
+          Tanyakan syarat pembuatan surat (Domisili, Keterangan Usaha, NA), atau informasi katalog produk UMKM pekon. Jika sistem membutuhkan verifikasi khusus, aparatur pekon akan langsung memandu percakapan Anda.
         </p>
       </div>
 

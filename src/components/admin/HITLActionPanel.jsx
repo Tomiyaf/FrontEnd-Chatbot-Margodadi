@@ -25,7 +25,7 @@ export default function HITLActionPanel({
     'Selamat pagi/siang, mohon lampirkan fotokopi KTP & KK untuk kelengkapan berkas pelayanan.',
     'Untuk pengurusan surat tersebut, Bapak/Ibu dapat datang langsung ke Balai Pekon Margodadi setiap Senin–Jumat pukul 08.00–15.30 WIB.',
     'Pengajuan Bapak/Ibu saat ini sedang diverifikasi oleh Seksi Pelayanan Pekon Margodadi.',
-    'Informasi Bank Sampah Berkah dapat diakses di Balai Dusun 1 setiap Minggu ke-2 dan ke-4.',
+    'Untuk informasi pendaftaran UMKM dan perizinan usaha, silakan lengkapi data produk melalui menu Potensi UMKM.',
     'Terima kasih telah menghubungi Layanan Pekon Margodadi. Apakah ada hal lain yang dapat kami bantu?',
   ]
 

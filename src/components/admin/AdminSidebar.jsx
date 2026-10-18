@@ -38,12 +38,6 @@ export default function AdminSidebar({
       roles: ['ADMIN'],
     },
     {
-      label: 'Monitoring Edukasi',
-      path: '/admin/education',
-      icon: 'school',
-      roles: ['ADMIN'],
-    },
-    {
       label: 'Laporan Layanan',
       path: '/admin/reports',
       icon: 'summarize',

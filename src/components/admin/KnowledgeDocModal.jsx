@@ -118,7 +118,6 @@ export default function KnowledgeDocModal({
               >
                 <option value="PUBLIC_SERVICE">🏛️ Layanan Publik & Administrasi</option>
                 <option value="UMKM">🛍️ Direktori & Produk UMKM</option>
-                <option value="WASTE_EDUCATION">♻️ Edukasi Pengelolaan Sampah 3R</option>
               </select>
             </div>
 

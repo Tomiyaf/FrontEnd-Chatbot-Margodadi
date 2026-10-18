@@ -11,7 +11,6 @@ const AdminLayout = lazy(() => import('../layouts/AdminLayout'))
 const HomePage = lazy(() => import('../pages/public/HomePage'))
 const LayananPublikPage = lazy(() => import('../pages/public/LayananPublikPage'))
 const PotensiUmkmPage = lazy(() => import('../pages/public/PotensiUmkmPage'))
-const EdukasiSampahPage = lazy(() => import('../pages/public/EdukasiSampahPage'))
 const TanyaVirtualGuidePage = lazy(() => import('../pages/public/TanyaVirtualGuidePage'))
 
 // Autentikasi
@@ -23,7 +22,6 @@ const ConversationsPage = lazy(() => import('../pages/admin/ConversationsPage'))
 const ConversationDetailPage = lazy(() => import('../pages/admin/ConversationDetailPage'))
 const OperatorsPage = lazy(() => import('../pages/admin/OperatorsPage'))
 const AnalyticsPage = lazy(() => import('../pages/admin/AnalyticsPage'))
-const EducationPage = lazy(() => import('../pages/admin/EducationPage'))
 const ReportsPage = lazy(() => import('../pages/admin/ReportsPage'))
 const KnowledgeBasePage = lazy(() => import('../pages/admin/KnowledgeBasePage'))
 const UmkmManagementPage = lazy(() => import('../pages/admin/UmkmManagementPage'))
@@ -55,10 +53,6 @@ export const router = createBrowserRouter([
       {
         path: 'potensi-umkm',
         element: withSuspense(PotensiUmkmPage, 'Memuat Direktori UMKM...'),
-      },
-      {
-        path: 'edukasi-sampah',
-        element: withSuspense(EdukasiSampahPage, 'Memuat Panduan Pilah Sampah...'),
       },
       {
         path: 'tanya-virtual-guide',
@@ -124,10 +118,6 @@ export const router = createBrowserRouter([
           {
             path: 'analytics',
             element: withSuspense(AnalyticsPage, 'Menghitung Analitik SLA...'),
-          },
-          {
-            path: 'education',
-            element: withSuspense(EducationPage, 'Memuat Riset Edukasi Sampah...'),
           },
           {
             path: 'reports',

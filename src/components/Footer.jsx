@@ -23,7 +23,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-xs text-on-surface-variant leading-relaxed">
-              Portal pusat koordinasi transparansi administratif, pemberdayaan ekonomi lokal desa, dan edukasi pengelolaan lingkungan mandiri berbasis asisten cerdas.
+              Portal pusat koordinasi transparansi administratif dan pemberdayaan ekonomi lokal desa berbasis asisten cerdas Virtual Guide.
             </p>
             <div className="flex items-center gap-2 pt-1">
               <a
@@ -88,11 +88,6 @@ export default function Footer() {
               <li>
                 <Link to="/potensi-umkm" className="hover:text-primary transition-colors">
                   Katalog UMKM Warga
-                </Link>
-              </li>
-              <li>
-                <Link to="/edukasi-sampah" className="hover:text-primary transition-colors">
-                  TPS3R &amp; Bank Sampah
                 </Link>
               </li>
               <li>

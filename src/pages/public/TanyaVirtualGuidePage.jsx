@@ -13,7 +13,7 @@ const initialMessages = [
   {
     id: 'msg-1',
     sender: 'bot',
-    text: 'Halo Warga Pekon Margodadi! Saya **Virtual Guide resmi Pekon Margodadi**. Ada yang dapat saya bantu terkait administrasi surat, syarat perizinan, produk UMKM desa, atau panduan pengelolaan sampah mandiri hari ini?',
+    text: 'Halo Warga Pekon Margodadi! Saya **Virtual Guide resmi Pekon Margodadi**. Ada yang dapat saya bantu terkait administrasi surat, syarat perizinan, atau produk UMKM desa hari ini?',
     timestamp: '09:15 WIB',
   },
 ]

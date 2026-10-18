@@ -9,7 +9,7 @@ export const researchService = {
       queryParams.append('fields', fieldList)
     }
 
-    const response = await api.get(`/admin/education/export-csv?${queryParams.toString()}`, {
+    const response = await api.get(`/admin/reports/export-csv?${queryParams.toString()}`, {
       responseType: 'blob',
     })
 
@@ -20,7 +20,7 @@ export const researchService = {
     
     // Extract filename from header or fallback
     const disposition = response.headers['content-disposition']
-    let filename = 'research_dataset_margodadi.csv'
+    let filename = 'laporan_layanan_margodadi.csv'
     if (disposition && disposition.includes('filename=')) {
       const match = disposition.match(/filename=["']?([^"';]+)["']?/)
       if (match && match[1]) filename = match[1]

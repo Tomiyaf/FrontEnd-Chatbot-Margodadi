@@ -71,7 +71,7 @@ export default function HomePage() {
   const popularSearches = [
     'Surat Pengantar SKTM',
     'Syarat KTP/KK',
-    'Bank Sampah Berkah',
+    'Surat Pengantar Nikah',
     'Kopi Robusta Margodadi',
     'Surat Keterangan Usaha',
   ]
@@ -107,87 +107,84 @@ export default function HomePage() {
 
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-on-surface tracking-tight leading-tight drop-shadow-2xs">
                 Selamat Datang di{' '}
-                <span className="text-primary font-black">Virtual Guide Pekon Margodadi</span>
+                <span className="text-primary font-black">Layanan Cerdas Pekon Margodadi</span>
               </h1>
 
               <p className="text-base sm:text-lg text-on-surface-variant max-w-2xl mt-4 leading-relaxed font-medium">
-                Pusat Informasi Pelayanan Administrasi Warga, Direktori Potensi UMKM Desa, dan Edukasi Lingkungan Berbasis Virtual Guide.
+                Pusat Informasi Pelayanan Administrasi Warga dan Direktori Potensi UMKM Desa Berbasis Virtual Guide AI.
               </p>
 
-            {/* Interactive Global Search Bar */}
-            <div className="w-full mt-8 md:mt-10">
-              <form
-                className="relative flex items-center bg-white/95 backdrop-blur-md rounded-2xl shadow-xl shadow-primary/10 p-2 sm:p-2.5 transition-all focus-within:ring-2 focus-within:ring-primary border border-gray-200/80"
-                onSubmit={handleSearchSubmit}
-              >
-                <div className="flex items-center pl-3 text-on-surface-variant">
-                  <span className="material-symbols-outlined text-2xl text-primary">search</span>
-                </div>
-                <input
-                  className="w-full px-3 py-3 text-sm sm:text-base text-on-surface bg-transparent focus:outline-none placeholder:text-outline/70"
-                  id="global-portal-search"
-                  placeholder="Cari syarat surat, SOP layanan, produk UMKM, modul sampah, atau regulasi pekon..."
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <button
-                  className="shrink-0 bg-primary hover:bg-primary-container text-on-primary px-5 sm:px-6 py-3 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 shadow-md cursor-pointer"
-                  type="submit"
+              {/* Interactive Global Search Bar */}
+              <div className="w-full mt-8 md:mt-10">
+                <form
+                  className="relative flex items-center bg-white/95 backdrop-blur-md rounded-2xl shadow-xl shadow-primary/10 p-2 sm:p-2.5 transition-all focus-within:ring-2 focus-within:ring-primary border border-gray-200/80"
+                  onSubmit={handleSearchSubmit}
                 >
-                  <span>Cari</span>
-                  <span className="material-symbols-outlined text-lg">arrow_forward</span>
-                </button>
-              </form>
-
-              {/* Popular Search Chips */}
-              <div className="flex flex-wrap items-center justify-center gap-2 mt-4 text-left">
-                <span className="text-xs text-on-surface-variant font-semibold flex items-center gap-1 bg-white/80 backdrop-blur-xs px-2.5 py-1 rounded-full border border-gray-200/60">
-                  <span className="material-symbols-outlined text-sm">trending_up</span> Sering Dicari:
-                </span>
-                {popularSearches.map((chip, index) => (
+                  <div className="flex items-center pl-3 text-on-surface-variant">
+                    <span className="material-symbols-outlined text-2xl text-primary">search</span>
+                  </div>
+                  <input
+                    className="w-full px-3 py-3 text-sm sm:text-base text-on-surface bg-transparent focus:outline-none placeholder:text-outline/70"
+                    id="global-portal-search"
+                    placeholder="Cari syarat surat, SOP layanan, produk UMKM, atau regulasi pekon..."
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                   <button
-                    key={index}
-                    type="button"
-                    className="text-xs px-3 py-1 rounded-full bg-white/85 hover:bg-white text-on-surface border border-gray-200/70 shadow-2xs transition-all cursor-pointer font-medium"
-                    onClick={() => setSearchQuery(chip)}
+                    className="shrink-0 bg-primary hover:bg-primary-container text-on-primary px-5 sm:px-6 py-3 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 shadow-md cursor-pointer"
+                    type="submit"
                   >
-                    {chip}
+                    <span>Cari</span>
+                    <span className="material-symbols-outlined text-lg">arrow_forward</span>
                   </button>
-                ))}
-              </div>
-            </div>
+                </form>
 
-            {/* Banner Asisten Virtual Interaktif */}
-            <div className="w-full mt-10 rounded-2xl bg-gradient-to-r from-primary via-primary-container to-tertiary-container text-on-primary p-6 md:p-8 shadow-xl relative overflow-hidden text-left">
-              <div className="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
-                <span className="material-symbols-outlined text-[200px]">smart_toy</span>
-              </div>
-              <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                <div className="space-y-2 max-w-xl">
-                  <h2 className="text-xl sm:text-2xl text-on-primary font-bold">
-                    Butuh Panduan Surat atau Produk Pekon dalam Sekejap?
-                  </h2>
-                  {/* <p className="text-xs sm:text-sm text-on-primary/85 leading-relaxed">
-                    Halo Warga Margodadi! Asisten cerdas terpadu siap mendampingi kebutuhan verifikasi syarat berkas, direktori UMKM, dan alur sampah 24 jam non-stop berdasar basis data resmi pekon.
-                  </p>*/}
+                {/* Popular Search Chips */}
+                <div className="flex flex-wrap items-center justify-center gap-2 mt-4 text-left">
+                  <span className="text-xs text-on-surface-variant font-semibold flex items-center gap-1 bg-white/80 backdrop-blur-xs px-2.5 py-1 rounded-full border border-gray-200/60">
+                    <span className="material-symbols-outlined text-sm">trending_up</span> Sering Dicari:
+                  </span>
+                  {popularSearches.map((chip, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      className="text-xs px-3 py-1 rounded-full bg-white/85 hover:bg-white text-on-surface border border-gray-200/70 shadow-2xs transition-all cursor-pointer font-medium"
+                      onClick={() => setSearchQuery(chip)}
+                    >
+                      {chip}
+                    </button>
+                  ))}
                 </div>
-                <div className="shrink-0 w-full md:w-auto">
-                  <Link
-                    to="/tanya-virtual-guide"
-                    className="w-full md:w-auto inline-flex items-center justify-center gap-2.5 bg-secondary-container hover:bg-secondary text-on-secondary px-6 py-3.5 rounded-xl text-sm font-bold transition-all shadow-md"
-                  >
-                    <span className="material-symbols-outlined text-xl">forum</span>
-                    <span>Mulai Konsultasi Online</span>
-                  </Link>
+              </div>
+
+              {/* Banner Asisten Virtual Interaktif */}
+              <div className="w-full mt-10 rounded-2xl bg-gradient-to-r from-primary via-primary-container to-tertiary-container text-on-primary p-6 md:p-8 shadow-xl relative overflow-hidden text-left">
+                <div className="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
+                  <span className="material-symbols-outlined text-[200px]">smart_toy</span>
+                </div>
+                <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                  <div className="space-y-2 max-w-xl">
+                    <h2 className="text-xl sm:text-2xl text-on-primary font-bold">
+                      Butuh Panduan Surat atau Produk Pekon dalam Sekejap?
+                    </h2>
+                  </div>
+                  <div className="shrink-0 w-full md:w-auto">
+                    <Link
+                      to="/tanya-virtual-guide"
+                      className="w-full md:w-auto inline-flex items-center justify-center gap-2.5 bg-secondary-container hover:bg-secondary text-on-secondary px-6 py-3.5 rounded-xl text-sm font-bold transition-all shadow-md"
+                    >
+                      <span className="material-symbols-outlined text-xl">forum</span>
+                      <span>Mulai Konsultasi Online</span>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-        {/* 2. PUSAT AKSES LAYANAN CEPAT (Quick Service Grid 4 Kolom) */}
+        {/* 2. PUSAT AKSES LAYANAN CEPAT (Quick Service Grid 3 Kolom) */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-3">
             <div>
@@ -195,15 +192,15 @@ export default function HomePage() {
                 Akses Mandiri
               </span>
               <h2 className="text-2xl sm:text-3xl text-on-surface font-bold">
-                Empat Kanal Utama Pekon Margodadi
+                Tiga Kanal Utama Pekon Margodadi
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-on-surface-variant max-w-md">
-              Gerbang pelayanan terpadu terintegrasi digital untuk kemudahan birokrasi, kemajuan ekonomi warga, dan kelestarian pekon.
+              Gerbang pelayanan terpadu terintegrasi digital untuk kemudahan birokrasi, kemajuan ekonomi warga, dan pendampingan cerdas pekon.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Card 1: Administrasi & Kependudukan */}
             <Link
               to="/layanan-publik"
@@ -252,31 +249,7 @@ export default function HomePage() {
               </div>
             </Link>
 
-            {/* Card 3: Edukasi Pengelolaan Sampah */}
-            <Link
-              to="/edukasi-sampah"
-              className="group bg-surface-container-lowest hover:bg-surface-container p-6 rounded-2xl shadow-xs hover:shadow-xl transition-all flex flex-col justify-between border border-surface-container-high/40"
-            >
-              <div>
-                <div className="w-14 h-14 rounded-xl bg-surface-container flex items-center justify-center text-tertiary group-hover:bg-tertiary-container group-hover:text-on-tertiary transition-colors mb-5 shadow-inner">
-                  <span className="material-symbols-outlined text-3xl">recycling</span>
-                </div>
-                <h3 className="text-base font-bold text-on-surface mb-2 group-hover:text-tertiary transition-colors">
-                  Edukasi Sampah &amp; TPS3R
-                </h3>
-                <p className="text-xs text-on-surface-variant line-clamp-3 leading-relaxed">
-                  Panduan pemilahan mandiri 3 wadah, jadwal penimbangan Bank Sampah Berkah, dan pengolahan pupuk kompos desa.
-                </p>
-              </div>
-              <div className="pt-6 flex items-center gap-1.5 text-xs font-bold text-tertiary">
-                <span>Pelajari Pemilahan</span>
-                <span className="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">
-                  arrow_forward
-                </span>
-              </div>
-            </Link>
-
-            {/* Card 4: Tanya Asisten Virtual Guide */}
+            {/* Card 3: Tanya Asisten Virtual Guide */}
             <Link
               to="/tanya-virtual-guide"
               className="group bg-surface-container-lowest hover:bg-surface-container p-6 rounded-2xl shadow-xs hover:shadow-xl transition-all flex flex-col justify-between border border-surface-container-high/40"
@@ -485,8 +458,8 @@ export default function HomePage() {
                 const waLink = item.waNumber
                   ? `https://wa.me/${String(item.waNumber).replace(/[^0-9]/g, '')}`
                   : item.phone
-                  ? `https://wa.me/${String(item.phone).replace(/[^0-9]/g, '')}`
-                  : 'https://wa.me/6282177890112'
+                    ? `https://wa.me/${String(item.phone).replace(/[^0-9]/g, '')}`
+                    : 'https://wa.me/6282177890112'
 
                 return (
                   <div
@@ -558,9 +531,6 @@ export default function HomePage() {
             </div>
           )}
         </section>
-
-        {/* 5. SOROTAN EDUKASI SAMPAH & BANK SAMPAH BERKAH */}
-
 
         {/* 6. HUBUNGI KAMI & HOTLINE WHATSAPP PEKON */}
         {/*

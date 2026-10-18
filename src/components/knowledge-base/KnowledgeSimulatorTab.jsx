@@ -14,7 +14,7 @@ export default function KnowledgeSimulatorTab({
   const sampleQueries = [
     'Bagaimana syarat membuat surat keterangan domisili usaha pekon?',
     'Apa saja produk olahan kopi robusta unggulan Margodadi?',
-    'Dimana jadwal pengumpulan sampah organik bank sampah desa?',
+    'Apa saja syarat pengurusan Surat Keterangan Usaha (SKU)?',
     'Berapa lama proses pembuatan izin usaha mikro kecil pekon?',
   ]
 
@@ -43,7 +43,7 @@ export default function KnowledgeSimulatorTab({
               value={simQuery}
               onChange={(e) => onSimQueryChange(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && onTestRetrieval()}
-              placeholder="Ketik pertanyaan warga (contoh: syarat surat izin usaha, bank sampah pekon)..."
+              placeholder="Ketik pertanyaan warga (contoh: syarat surat izin usaha, katalog produk umkm)..."
               className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
             />
             <button
@@ -95,7 +95,6 @@ export default function KnowledgeSimulatorTab({
               <option value="ALL">Semua Domain (Global)</option>
               <option value="PUBLIC_SERVICE">Layanan Publik Desa</option>
               <option value="UMKM">Potensi &amp; Produk UMKM</option>
-              <option value="WASTE_EDUCATION">Edukasi Pengelolaan Sampah</option>
             </select>
           </div>
 

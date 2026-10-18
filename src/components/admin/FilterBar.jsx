@@ -76,7 +76,6 @@ export default function FilterBar({
             >
               <option value="ALL">Semua Kategori</option>
               <option value="Administrasi">Administrasi</option>
-              <option value="Edukasi Sampah">Edukasi Sampah</option>
               <option value="Potensi UMKM">Potensi UMKM</option>
               <option value="Informasi Publik">Informasi Publik</option>
             </select>

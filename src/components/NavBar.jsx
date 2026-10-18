@@ -8,7 +8,6 @@ export default function NavBar() {
     { name: 'Beranda', path: '/' },
     { name: 'Layanan', path: '/layanan-publik' },
     { name: 'UMKM', path: '/potensi-umkm' },
-    { name: 'Edukasi Sampah', path: '/edukasi-sampah' },
   ]
 
   const closeMenu = () => setMobileMenuOpen(false)

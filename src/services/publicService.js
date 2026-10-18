@@ -36,14 +36,6 @@ export const publicService = {
     const response = await api.get(`/public/umkms/${id}`)
     return response.data
   },
-
-  /**
-   * Get public waste education topics
-   */
-  async getEducationTopics() {
-    const response = await api.get('/public/education/topics')
-    return response.data
-  },
 }
 
 export default publicService
