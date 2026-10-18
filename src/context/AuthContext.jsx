@@ -60,6 +60,11 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('vg_operator')
   }
 
+  const updateOperator = (newOperatorData) => {
+    setOperator(newOperatorData)
+    localStorage.setItem('vg_operator', JSON.stringify(newOperatorData))
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -69,6 +74,7 @@ export function AuthProvider({ children }) {
         isLoading,
         login,
         logout,
+        updateOperator,
       }}
     >
       {children}

@@ -34,11 +34,7 @@ export default function AdminLayout() {
     name: operator?.name || 'Aparatur Desa',
     email: operator?.email || 'admin@margodadi.desa.id',
     role: operator?.role || 'ADMIN',
-    avatar:
-      operator?.avatar_url ||
-      (currentRole === 'ADMIN'
-        ? 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
-        : 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80'),
+    avatar: operator?.avatar_url || '/favicon.svg',
   }
 
   // Fetch real HITL counter from DB

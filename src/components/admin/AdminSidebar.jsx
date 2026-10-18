@@ -161,9 +161,12 @@ export default function AdminSidebar({
           {/* Quick Active Operator Card */}
           <div className="flex items-center gap-3 p-2 rounded-xl bg-slate-800/40 border border-slate-700/50">
             <img
-              src={activeOperator.avatar}
+              src={activeOperator.avatar || '/favicon.svg'}
               alt={activeOperator.name}
-              className="w-9 h-9 rounded-full object-cover border border-slate-600 shrink-0"
+              onError={(e) => {
+                e.currentTarget.src = '/favicon.svg'
+              }}
+              className="w-9 h-9 rounded-full object-cover border border-slate-600 shrink-0 bg-slate-800"
             />
             <div className="flex-1 min-w-0">
               <p className="text-xs font-bold text-white truncate">{activeOperator.name}</p>

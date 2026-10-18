@@ -1,4 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useAuth } from '../../context/AuthContext'
+import AvatarUploadModal from '../admin/AvatarUploadModal'
 
 export default function ProfileTab({
   name,
@@ -11,12 +13,16 @@ export default function ProfileTab({
   profileMessage,
   onSubmit,
 }) {
+  const { operator } = useAuth()
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
+  const currentAvatar = operator?.avatar_url || '/favicon.svg'
+
   return (
     <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-xs space-y-6">
       <div>
         <h2 className="text-base font-bold text-slate-900">Informasi Profil Aparatur</h2>
         <p className="text-xs text-slate-500 mt-0.5">
-          Perbarui identitas akun operator dan kontak resmi balai desa.
+          Perbarui foto profil, identitas akun aparatur, dan kontak resmi pelayanan desa.
         </p>
       </div>
 
@@ -34,6 +40,55 @@ export default function ProfileTab({
           <span>{profileMessage.text}</span>
         </div>
       )}
+
+      {/* Avatar Section */}
+      <div className="flex flex-col sm:flex-row items-center gap-5 p-4.5 bg-slate-50 border border-slate-200/80 rounded-2xl">
+        <div className="relative group shrink-0">
+          <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-slate-300 bg-white shadow-xs flex items-center justify-center">
+            <img
+              src={currentAvatar}
+              alt="Foto Profil"
+              onError={(e) => {
+                e.currentTarget.src = '/favicon.svg'
+              }}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsAvatarModalOpen(true)}
+            className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary hover:bg-primary-dark text-white flex items-center justify-center shadow-md cursor-pointer transition-colors"
+            title="Ganti Foto Profil"
+          >
+            <span className="material-symbols-outlined text-sm">photo_camera</span>
+          </button>
+        </div>
+        <div className="text-center sm:text-left space-y-1">
+          <div className="flex items-center gap-2 justify-center sm:justify-start">
+            <h3 className="text-sm font-bold text-slate-800">Foto Profil Aparatur</h3>
+            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+              operator?.avatar_url
+                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                : 'bg-slate-200 text-slate-700'
+            }`}>
+              {operator?.avatar_url ? 'Foto Kustom' : 'Favicon Bawaan'}
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 max-w-lg">
+            Foto ini ditampilkan pada bilah samping (sidebar), header, dan riwayat penanganan tiket. Jika belum diatur, sistem otomatis menggunakan Favicon resmi Pekon Margodadi sebagai gambar default bawaan.
+          </p>
+          <div className="pt-1 flex items-center justify-center sm:justify-start gap-2">
+            <button
+              type="button"
+              onClick={() => setIsAvatarModalOpen(true)}
+              className="px-3.5 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+            >
+              <span className="material-symbols-outlined text-sm text-primary">edit</span>
+              <span>Ganti Foto Mandiri</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -86,6 +141,12 @@ export default function ProfileTab({
           </button>
         </div>
       </form>
+
+      {/* Modal Upload Avatar */}
+      <AvatarUploadModal
+        isOpen={isAvatarModalOpen}
+        onClose={() => setIsAvatarModalOpen(false)}
+      />
     </div>
   )
 }

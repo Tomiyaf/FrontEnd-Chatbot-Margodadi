@@ -380,9 +380,12 @@ export default function ConversationDetailPage() {
               {conversation.assigned_operator ? (
                 <div className="flex items-center gap-2.5 min-w-0">
                   <img
-                    src={conversation.assigned_operator.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
+                    src={conversation.assigned_operator.avatar || '/favicon.svg'}
                     alt={conversation.assigned_operator.name}
-                    className="w-9 h-9 rounded-full object-cover border border-slate-300 shrink-0"
+                    onError={(e) => {
+                      e.currentTarget.src = '/favicon.svg'
+                    }}
+                    className="w-9 h-9 rounded-full object-cover border border-slate-300 shrink-0 bg-slate-100"
                   />
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-bold text-slate-900 truncate">

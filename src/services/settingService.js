@@ -28,6 +28,23 @@ export const settingService = {
   },
 
   /**
+   * Update current operator avatar via file upload or URL
+   * @param {FormData|Object} payload
+   */
+  async updateAvatar(payload) {
+    const response = await api.post('/admin/settings/avatar', payload)
+    return response.data
+  },
+
+  /**
+   * Reset current operator avatar to default (favicon)
+   */
+  async resetAvatar() {
+    const response = await api.post('/admin/settings/avatar', { reset: true })
+    return response.data
+  },
+
+  /**
    * Change operator password
    * @param {Object} payload - { current_password, new_password }
    */
