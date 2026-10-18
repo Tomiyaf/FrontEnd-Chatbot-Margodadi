@@ -652,7 +652,7 @@ export default function HomePage() {
                   ? `https://wa.me/${String(item.waNumber).replace(/[^0-9]/g, '')}`
                   : item.phone
                     ? `https://wa.me/${String(item.phone).replace(/[^0-9]/g, '')}`
-                    : 'https://wa.me/6282177890112'
+                    : 'https://wa.me/6285185222303'
 
                 return (
                   <div

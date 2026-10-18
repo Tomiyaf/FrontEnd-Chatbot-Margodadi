@@ -1,6 +1,35 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import publicService from '../services/publicService'
+
+const DEFAULT_WA_LINK = 'https://wa.me/6285185222303?text=' + encodeURIComponent('Halo Admin Pekon Margodadi, saya ingin bertanya terkait layanan pekon.')
 
 export default function Footer() {
+  const [waCenter, setWaCenter] = useState({
+    wa_link: DEFAULT_WA_LINK,
+    phone_number: '6285185222303',
+    display_number: '+62 851-8522-2303',
+    is_online: false,
+  })
+
+  useEffect(() => {
+    let isMounted = true
+    publicService
+      .getWhatsAppCenter()
+      .then((res) => {
+        if (isMounted && res?.data?.wa_link) {
+          setWaCenter(res.data)
+        }
+      })
+      .catch((err) => {
+        console.debug('Using fallback WhatsApp Center number:', err)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
   return (
     <footer className="w-full bg-surface-container-low pt-12 pb-8 text-on-surface-variant border-t border-surface-container-high/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,10 +56,11 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-2 pt-1">
               <a
-                className="inline-flex items-center gap-2 bg-primary text-on-primary hover:bg-primary-container px-4 py-2 rounded-lg text-xs font-semibold transition-colors"
-                href="https://wa.me/6282177890112"
+                className="inline-flex items-center gap-2 bg-primary text-on-primary hover:bg-primary-container px-4 py-2 rounded-lg text-xs font-semibold transition-colors shadow-2xs"
+                href={waCenter.wa_link}
                 target="_blank"
                 rel="noopener noreferrer"
+                title={waCenter.is_online ? `WhatsApp Center Aktif (${waCenter.display_number})` : `WhatsApp Center Pekon (${waCenter.display_number})`}
               >
                 <span className="material-symbols-outlined text-base leading-none">support_agent</span>
                 <span>WhatsApp Center Pekon</span>
