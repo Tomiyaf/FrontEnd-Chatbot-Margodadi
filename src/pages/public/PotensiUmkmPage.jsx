@@ -7,14 +7,12 @@ import LazyModal from '../../components/common/LazyModal'
 
 // Lazy loaded modals
 const UmkmDetailModal = lazy(() => import('../../components/umkm/UmkmDetailModal'))
-const UmkmManualModal = lazy(() => import('../../components/umkm/UmkmManualModal'))
 
 export default function PotensiUmkmPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [sortBy, setSortBy] = useState('popular')
   const [selectedProfileModal, setSelectedProfileModal] = useState(null)
-  const [showManualModal, setShowManualModal] = useState(false)
   const [toastMessage, setToastMessage] = useState(null)
   const [umkmList, setUmkmList] = useState([])
   const [categories, setCategories] = useState([
@@ -33,21 +31,20 @@ export default function PotensiUmkmPage() {
     }, 3200)
   }
 
-  // Handle ESC key when any modal is open
+  // Handle ESC key when modal is open
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         setSelectedProfileModal(null)
-        setShowManualModal(false)
       }
     }
-    if (selectedProfileModal || showManualModal) {
+    if (selectedProfileModal) {
       window.addEventListener('keydown', handleKeyDown)
     }
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [selectedProfileModal, showManualModal])
+  }, [selectedProfileModal])
 
   // Fetch UMKM from API
   useEffect(() => {
@@ -174,45 +171,9 @@ export default function PotensiUmkmPage() {
             ))}
           </div>
         )}
-
-        {/* 3. Call-To-Action Banner */}
-        <section className="bg-primary text-on-primary rounded-3xl p-6 sm:p-8 lg:p-10 relative overflow-hidden shadow-md">
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-            <div className="lg:col-span-8 space-y-3">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed text-xs font-bold">
-                <span className="material-symbols-outlined text-sm">how_to_reg</span>
-                PROGRAM PEMBERDAYAAN EKONOMI PEKON
-              </div>
-              <h3 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight">
-                Apakah Anda Pelaku Usaha Warga Margodadi?
-              </h3>
-              <p className="text-xs sm:text-sm text-on-primary/90 max-w-2xl leading-relaxed">
-                Daftarkan UMKM Anda secara gratis di kantor balai pekon atau melalui formulir panduan asisten virtual. Dapatkan publikasi katalog digital, verifikasi legalitas usaha pekon, dan kemudahan pencarian pelanggan daring!
-              </p>
-            </div>
-
-            <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 justify-center">
-              <Link
-                to="/tanya-virtual-guide?prompt=Saya%20ingin%20mendaftarkan%20UMKM%20baru%20di%20Pekon%20Margodadi"
-                className="inline-flex items-center justify-center gap-2 bg-secondary-container hover:bg-secondary text-on-secondary px-5 py-3 rounded-xl text-xs sm:text-sm font-bold shadow-xs transition-colors text-center"
-              >
-                <span className="material-symbols-outlined text-lg">app_registration</span>
-                <span>Daftar Lewat Asisten AI</span>
-              </Link>
-              <button
-                type="button"
-                onClick={() => setShowManualModal(true)}
-                className="inline-flex items-center justify-center gap-2 bg-on-primary/10 hover:bg-on-primary/20 text-on-primary px-4 py-2.5 rounded-xl text-xs font-semibold transition-colors text-center cursor-pointer"
-              >
-                <span className="material-symbols-outlined text-base">contact_support</span>
-                <span>Persyaratan Registrasi Manual</span>
-              </button>
-            </div>
-          </div>
-        </section>
       </section>
 
-      {/* 4. On-Demand Lazy Modals */}
+      {/* On-Demand Lazy Modal */}
       <LazyModal
         isOpen={!!selectedProfileModal}
         onClose={() => setSelectedProfileModal(null)}
@@ -222,13 +183,6 @@ export default function PotensiUmkmPage() {
           umkm: selectedProfileModal,
           onToast: showToast,
         }}
-      />
-
-      <LazyModal
-        isOpen={showManualModal}
-        onClose={() => setShowManualModal(false)}
-        Component={UmkmManualModal}
-        fallbackTitle="Memuat Panduan Registrasi..."
       />
     </div>
   )
