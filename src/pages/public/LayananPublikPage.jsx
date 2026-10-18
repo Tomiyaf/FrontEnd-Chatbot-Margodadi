@@ -7,13 +7,7 @@ export default function LayananPublikPage() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [expandedCards, setExpandedCards] = useState({ sku: true })
   const [servicesData, setServicesData] = useState([])
-  const [categories, setCategories] = useState([
-    { id: 'all', name: 'Semua Layanan Publik', icon: 'category', count: 6 },
-    { id: 'administrasi-kependudukan', name: 'Administrasi Kependudukan', icon: 'badge', count: 1 },
-    { id: 'surat-pengantar', name: 'Surat Pengantar & Keterangan', icon: 'description', count: 3 },
-    { id: 'sop-loket', name: 'Standar Operasional (SOP) Loket', icon: 'rule', count: 1 },
-    { id: 'fasilitas-desa', name: 'Fasilitas & Sarpras Pekon', icon: 'meeting_room', count: 1 },
-  ])
+  const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -125,41 +119,59 @@ export default function LayananPublikPage() {
                   Kategori Layanan
                 </h3>
                 <span className="px-2 py-0.5 rounded-full bg-surface-container text-xs text-on-surface-variant font-semibold">
-                  16 Total
+                  {categories.find((c) => c.id === 'all')?.count ?? servicesData.length} Total
                 </span>
               </div>
 
               {/* Buttons Group Filter */}
               <nav className="flex flex-col gap-1.5" id="category-filter-nav">
-                {categories.map((cat) => {
-                  const isActive = selectedCategory === cat.id
-                  return (
-                    <button
-                      key={cat.id}
-                      onClick={() => setSelectedCategory(cat.id)}
-                      type="button"
-                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-left transition-all cursor-pointer ${
-                        isActive
-                          ? 'bg-primary-container text-on-primary font-semibold shadow-xs'
-                          : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span className="material-symbols-outlined text-base leading-none">{cat.icon}</span>
-                        <span>{cat.name}</span>
-                      </div>
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-xs ${
+                {categories.length === 0 && loading ? (
+                  <div className="space-y-2 py-1">
+                    <div className="h-9 bg-surface-container/70 rounded-xl animate-pulse" />
+                    <div className="h-9 bg-surface-container/70 rounded-xl animate-pulse" />
+                    <div className="h-9 bg-surface-container/70 rounded-xl animate-pulse" />
+                    <div className="h-9 bg-surface-container/70 rounded-xl animate-pulse" />
+                  </div>
+                ) : (
+                  categories.map((cat) => {
+                    const isActive = selectedCategory === cat.id
+                    const iconName =
+                      {
+                        'id-card': 'badge',
+                        'id_card': 'badge',
+                        users: 'groups',
+                        user: 'person',
+                        store: 'storefront',
+                      }[cat.icon] || cat.icon || 'description'
+
+                    return (
+                      <button
+                        key={cat.id}
+                        onClick={() => setSelectedCategory(cat.id)}
+                        type="button"
+                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm text-left transition-all cursor-pointer ${
                           isActive
-                            ? 'bg-on-primary/20 text-on-primary'
-                            : 'bg-surface-container text-on-surface-variant font-semibold'
+                            ? 'bg-primary-container text-on-primary font-semibold shadow-xs'
+                            : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'
                         }`}
                       >
-                        {cat.count}
-                      </span>
-                    </button>
-                  )
-                })}
+                        <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                          <span className="material-symbols-outlined text-lg leading-none shrink-0">{iconName}</span>
+                          <span className="line-clamp-1">{cat.name}</span>
+                        </div>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-xs shrink-0 ${
+                            isActive
+                              ? 'bg-on-primary/20 text-on-primary'
+                              : 'bg-surface-container text-on-surface-variant font-semibold'
+                          }`}
+                        >
+                          {cat.count}
+                        </span>
+                      </button>
+                    )
+                  })
+                )}
               </nav>
             </div>
 
@@ -357,13 +369,13 @@ export default function LayananPublikPage() {
                             <span>Konsultasikan Persyaratan Ini dengan Virtual Guide</span>
                           </Link>
                           <a
-                            href="https://wa.me/6282177890112"
+                            href={service.downloadUrl || 'https://wa.me/6282177890112'}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 bg-surface-container-highest hover:bg-surface-container text-on-surface px-4 py-2.5 rounded-xl text-xs font-semibold transition-colors"
                           >
                             <span className="material-symbols-outlined text-base text-primary">download</span>
-                            <span>Unduh Blangko Permohonan</span>
+                            <span>{service.downloadUrl ? 'Unduh Blangko Permohonan' : 'Hubungi Loket via WhatsApp'}</span>
                           </a>
                         </div>
                       </div>

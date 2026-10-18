@@ -50,6 +50,12 @@ export default function AdminSidebar({
       roles: ['ADMIN'],
     },
     {
+      label: 'Layanan Publik',
+      path: '/admin/services',
+      icon: 'assured_workload',
+      roles: ['ADMIN', 'OPERATOR'],
+    },
+    {
       label: 'Potensi UMKM',
       path: '/admin/umkm',
       icon: 'storefront',
