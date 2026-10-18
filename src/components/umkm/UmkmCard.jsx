@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import LazyImage from '../common/LazyImage'
 
 export default function UmkmCard({ item, onSelectProfile }) {
@@ -47,28 +46,10 @@ export default function UmkmCard({ item, onSelectProfile }) {
           <p className="text-xs text-on-surface-variant line-clamp-2 pt-1 leading-relaxed">
             {item.description}
           </p>
-
-          {/* Featured Products Pills */}
-          <div className="pt-2">
-            <span className="text-[11px] font-bold text-on-surface uppercase tracking-wider block mb-1.5">
-              Produk Unggulan:
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              {item.featuredProducts?.slice(0, 2).map((prod, pidx) => (
-                <span
-                  key={pidx}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container text-xs text-on-surface"
-                >
-                  <span>{prod.name}</span>
-                  <strong className="text-primary font-bold">{prod.price}</strong>
-                </span>
-              ))}
-            </div>
-          </div>
         </div>
 
-        {/* Card Action Buttons */}
-        <div className="pt-2 space-y-2">
+        {/* Card Action Button */}
+        <div className="pt-2">
           <button
             className="w-full flex items-center justify-center gap-2 bg-primary text-on-primary py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold hover:bg-primary-container transition-all shadow-xs cursor-pointer"
             onClick={() => onSelectProfile(item)}
@@ -77,13 +58,6 @@ export default function UmkmCard({ item, onSelectProfile }) {
             <span>Lihat Profil Lengkap</span>
             <span className="material-symbols-outlined text-base">visibility</span>
           </button>
-          <Link
-            to={`/tanya-virtual-guide?umkm=${encodeURIComponent(item.name)}`}
-            className="w-full flex items-center justify-center gap-1.5 bg-surface-container hover:bg-surface-container-high text-primary py-2 px-3 rounded-xl text-xs font-semibold transition-colors"
-          >
-            <span className="material-symbols-outlined text-base">smart_toy</span>
-            <span>Tanya Stok ke Virtual Guide</span>
-          </Link>
         </div>
       </div>
     </article>

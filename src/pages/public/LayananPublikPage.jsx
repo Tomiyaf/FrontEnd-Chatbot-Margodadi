@@ -282,13 +282,14 @@ export default function LayananPublikPage() {
                     </p>
 
                     {/* Syarat Ringkas Highlight jika belum di-expand */}
-                    {!isExpanded && (
+                    {!isExpanded && Array.isArray(service.requirements) && service.requirements.length > 0 && (
                       <div className="p-3.5 rounded-xl bg-surface-container-low flex flex-wrap items-center gap-y-2 gap-x-4 text-xs text-on-surface-variant font-medium border border-surface-container-high/30">
                         <span className="font-semibold text-primary flex items-center gap-1">
                           <span className="material-symbols-outlined text-sm">checklist</span> Persyaratan Utama:
                         </span>
-                        <span>• {service.requirements[0]}</span>
-                        <span>• {service.requirements[1]}</span>
+                        {service.requirements.slice(0, 2).map((req, ridx) => (
+                          <span key={ridx}>• {req}</span>
+                        ))}
                       </div>
                     )}
 
