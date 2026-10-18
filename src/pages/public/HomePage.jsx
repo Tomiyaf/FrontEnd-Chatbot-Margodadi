@@ -1,12 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import heroBg from '../../assets/hero-bg.jpg'
 import publicService from '../../services/publicService'
+import searchService from '../../services/searchService'
 import LazyImage from '../../components/common/LazyImage'
 import UmkmDetailModal from '../../components/umkm/UmkmDetailModal'
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState(null)
+  const [isSearching, setIsSearching] = useState(false)
+  const [showDropdown, setShowDropdown] = useState(false)
+  const searchContainerRef = useRef(null)
+
   const [umkmList, setUmkmList] = useState([])
   const [totalUmkm, setTotalUmkm] = useState(0)
   const [umkmLoading, setUmkmLoading] = useState(true)
@@ -54,32 +60,74 @@ export default function HomePage() {
     }
   }, [])
 
+  // Debounced live search
   useEffect(() => {
+    const trimmed = searchQuery.trim()
+    if (trimmed.length < 2) {
+      setSearchResults(null)
+      setShowDropdown(false)
+      setIsSearching(false)
+      return
+    }
+
+    let isCurrent = true
+    setIsSearching(true)
+    setShowDropdown(true)
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await searchService.globalSearch(trimmed, 6)
+        if (isCurrent && res?.data) {
+          setSearchResults(res.data)
+        }
+      } catch (err) {
+        console.error('Global search error:', err)
+      } finally {
+        if (isCurrent) setIsSearching(false)
+      }
+    }, 300)
+
+    return () => {
+      isCurrent = false
+      clearTimeout(timer)
+    }
+  }, [searchQuery])
+
+  // Handle click outside and Escape key
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
+        setShowDropdown(false)
+      }
+    }
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
+        setShowDropdown(false)
         setSelectedUmkmModal(null)
       }
     }
-    if (selectedUmkmModal) {
-      window.addEventListener('keydown', handleKeyDown)
-    }
+    document.addEventListener('mousedown', handleClickOutside)
+    window.addEventListener('keydown', handleKeyDown)
     return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [selectedUmkmModal])
+  }, [])
 
   const popularSearches = [
-    'Surat Pengantar SKTM',
-    'Syarat KTP/KK',
-    'Surat Pengantar Nikah',
-    'Kopi Robusta Margodadi',
-    'Surat Keterangan Usaha',
+    'SKU',
+    'SKTM',
+    'e-KTP',
+    'Domisili',
+    'Kopi Robusta',
+    'Madu Hutan',
   ]
 
   const handleSearchSubmit = (e) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      navigate(`/tanya-virtual-guide?q=${encodeURIComponent(searchQuery)}`)
+      setShowDropdown(false)
+      navigate(`/tanya-virtual-guide?prompt=${encodeURIComponent(searchQuery.trim())}`)
     }
   }
 
@@ -115,7 +163,7 @@ export default function HomePage() {
               </p>
 
               {/* Interactive Global Search Bar */}
-              <div className="w-full mt-8 md:mt-10">
+              <div className="w-full mt-8 md:mt-10 relative" ref={searchContainerRef}>
                 <form
                   className="relative flex items-center bg-white/95 backdrop-blur-md rounded-2xl shadow-xl shadow-primary/10 p-2 sm:p-2.5 transition-all focus-within:ring-2 focus-within:ring-primary border border-gray-200/80"
                   onSubmit={handleSearchSubmit}
@@ -130,7 +178,23 @@ export default function HomePage() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => {
+                      if (searchQuery.trim().length >= 2) setShowDropdown(true)
+                    }}
                   />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery('')
+                        setShowDropdown(false)
+                      }}
+                      className="p-1.5 text-slate-400 hover:text-slate-600 rounded-full transition-colors mr-1 cursor-pointer"
+                      title="Hapus pencarian"
+                    >
+                      <span className="material-symbols-outlined text-lg">close</span>
+                    </button>
+                  )}
                   <button
                     className="shrink-0 bg-primary hover:bg-primary-container text-on-primary px-5 sm:px-6 py-3 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 shadow-md cursor-pointer"
                     type="submit"
@@ -139,6 +203,132 @@ export default function HomePage() {
                     <span className="material-symbols-outlined text-lg">arrow_forward</span>
                   </button>
                 </form>
+
+                {/* Dropdown Live Search Results Popover */}
+                {showDropdown && (
+                  <div className="absolute left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-200/80 overflow-hidden z-30 text-left animate-in fade-in slide-in-from-top-2 duration-150">
+                    {isSearching ? (
+                      <div className="p-5 flex items-center justify-center gap-2.5 text-xs text-on-surface-variant">
+                        <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                        <span>Mencari di direktori layanan &amp; UMKM Margodadi...</span>
+                      </div>
+                    ) : (
+                      <>
+                        {(() => {
+                          const services = searchResults?.public_services || []
+                          const umkms = searchResults?.umkms || []
+                          const hasResults = services.length > 0 || umkms.length > 0
+
+                          if (!hasResults) {
+                            return (
+                              <div className="p-6 text-center space-y-2">
+                                <span className="material-symbols-outlined text-3xl text-slate-400">search_off</span>
+                                <p className="text-xs sm:text-sm font-medium text-slate-700">
+                                  Tidak ditemukan layanan atau UMKM untuk &quot;{searchQuery}&quot;
+                                </p>
+                                <p className="text-[11px] text-slate-500">
+                                  Tetap dapat menanyakannya ke Asisten AI Virtual Guide Pekon.
+                                </p>
+                              </div>
+                            )
+                          }
+
+                          return (
+                            <div className="max-h-80 overflow-y-auto divide-y divide-gray-100 p-2 space-y-2">
+                              {/* Layanan Publik Section */}
+                              {services.length > 0 && (
+                                <div className="space-y-1">
+                                  <div className="px-3 py-1.5 text-[11px] font-bold text-primary uppercase tracking-wider flex items-center gap-1.5">
+                                    <span className="material-symbols-outlined text-sm">description</span>
+                                    <span>Layanan Publik ({services.length})</span>
+                                  </div>
+                                  {services.map((srv) => (
+                                    <Link
+                                      key={srv.service_id || srv.id}
+                                      to="/layanan-publik"
+                                      onClick={() => setShowDropdown(false)}
+                                      className="flex items-start justify-between p-2.5 rounded-xl hover:bg-slate-50 transition-colors group"
+                                    >
+                                      <div className="min-w-0 pr-3">
+                                        <div className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-primary transition-colors truncate">
+                                          {srv.title}
+                                        </div>
+                                        <div className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
+                                          {srv.description}
+                                        </div>
+                                      </div>
+                                      <span className="shrink-0 px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[10px] font-semibold">
+                                        {srv.category_badge || 'Layanan'}
+                                      </span>
+                                    </Link>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Potensi UMKM Section */}
+                              {umkms.length > 0 && (
+                                <div className="space-y-1 pt-2">
+                                  <div className="px-3 py-1.5 text-[11px] font-bold text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                                    <span className="material-symbols-outlined text-sm">storefront</span>
+                                    <span>Potensi UMKM Warga ({umkms.length})</span>
+                                  </div>
+                                  {umkms.map((u) => (
+                                    <Link
+                                      key={u.umkm_id || u.id}
+                                      to="/potensi-umkm"
+                                      onClick={() => setShowDropdown(false)}
+                                      className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition-colors group"
+                                    >
+                                      <div className="flex items-center gap-2.5 min-w-0 pr-3">
+                                        {u.banner_image_url ? (
+                                          <img
+                                            src={u.banner_image_url}
+                                            alt={u.name}
+                                            className="w-9 h-9 rounded-lg object-cover shrink-0"
+                                          />
+                                        ) : (
+                                          <div className="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+                                            <span className="material-symbols-outlined text-base">storefront</span>
+                                          </div>
+                                        )}
+                                        <div className="min-w-0">
+                                          <div className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-primary transition-colors truncate">
+                                            {u.name}
+                                          </div>
+                                          <div className="text-[11px] text-slate-500 truncate">
+                                            {u.owner_name} {u.address ? `• ${u.address}` : ''}
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <span className="shrink-0 text-slate-400 group-hover:text-primary transition-colors">
+                                        <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                      </span>
+                                    </Link>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )
+                        })()}
+
+                        {/* Bottom Bar: Quick AI Action */}
+                        <div className="p-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                          <span className="text-[11px] text-slate-500 pl-2">
+                            Tekan Enter untuk tanya Virtual Guide
+                          </span>
+                          <Link
+                            to={`/tanya-virtual-guide?prompt=${encodeURIComponent(searchQuery.trim())}`}
+                            onClick={() => setShowDropdown(false)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-on-primary text-xs font-semibold hover:bg-primary-container transition-colors shadow-2xs"
+                          >
+                            <span className="material-symbols-outlined text-sm">smart_toy</span>
+                            <span>Tanya Asisten AI</span>
+                          </Link>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
 
                 {/* Popular Search Chips */}
                 <div className="flex flex-wrap items-center justify-center gap-2 mt-4 text-left">
@@ -150,7 +340,10 @@ export default function HomePage() {
                       key={index}
                       type="button"
                       className="text-xs px-3 py-1 rounded-full bg-white/85 hover:bg-white text-on-surface border border-gray-200/70 shadow-2xs transition-all cursor-pointer font-medium"
-                      onClick={() => setSearchQuery(chip)}
+                      onClick={() => {
+                        setSearchQuery(chip)
+                        setShowDropdown(true)
+                      }}
                     >
                       {chip}
                     </button>

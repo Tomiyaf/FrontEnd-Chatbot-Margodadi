@@ -26,7 +26,7 @@ export default function TanyaVirtualGuidePage() {
   const [conversationId, setConversationId] = useState(null)
 
   const [inputText, setInputText] = useState(() => {
-    const promptQuery = searchParams.get('prompt')
+    const promptQuery = searchParams.get('prompt') || searchParams.get('q')
     const layananQuery = searchParams.get('layanan')
     const umkmQuery = searchParams.get('umkm')
 
