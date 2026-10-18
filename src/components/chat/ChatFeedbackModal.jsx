@@ -18,6 +18,7 @@ export default function ChatFeedbackModal({ isOpen, onClose, onSubmitFeedback, s
       setSubmitted(true)
       setTimeout(() => {
         setSubmitted(false)
+        setComment('')
         onClose()
       }, 1500)
     } catch (err) {
@@ -28,8 +29,14 @@ export default function ChatFeedbackModal({ isOpen, onClose, onSubmitFeedback, s
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-5 animate-in zoom-in-95 duration-200">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-5 animate-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div className="flex items-center space-x-2">
             <span className="w-8 h-8 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center">
