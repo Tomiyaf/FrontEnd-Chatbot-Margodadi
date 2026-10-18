@@ -103,16 +103,46 @@ export default function LayananPublikPage() {
               </button>
             </div>
           </div>
+
+          {/* Mobile Horizontal Category Scroller */}
+          {categories.length > 0 && (
+            <div className="lg:hidden flex items-center gap-1.5 overflow-x-auto pt-3 pb-1 scrollbar-none">
+              {categories.map((cat) => {
+                const isActive = selectedCategory === cat.id
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.id)}
+                    type="button"
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
+                      isActive
+                        ? 'bg-primary text-on-primary shadow-xs'
+                        : 'bg-surface-container-lowest text-on-surface-variant border border-surface-container-high/60 hover:bg-surface-container'
+                    }`}
+                  >
+                    <span>{cat.name}</span>
+                    <span
+                      className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                        isActive ? 'bg-white/20 text-white' : 'bg-surface-container-high text-on-surface-variant'
+                      }`}
+                    >
+                      {cat.count}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
         </div>
       </section>
 
       {/* 2. SECTION DUAL PANEL TATA LETAK */}
-      <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+      <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* SISI KIRI: FILTER SUBKATEGORI & VIRTUAL GUIDE PROMPT */}
-          <aside className="lg:col-span-4 space-y-6 lg:sticky lg:top-28">
-            {/* Filter Navigation Box */}
-            <div className="bg-surface-container-lowest p-5 rounded-2xl shadow-xs border border-surface-container-high/60 space-y-4">
+          <aside className="lg:col-span-4 space-y-6 lg:sticky lg:top-28 order-2 lg:order-1">
+            {/* Filter Navigation Box (Desktop only, mobile uses horizontal pills above) */}
+            <div className="hidden lg:block bg-surface-container-lowest p-5 rounded-2xl shadow-xs border border-surface-container-high/60 space-y-4">
               <div className="flex items-center justify-between pb-1">
                 <h3 className="text-sm font-bold text-on-surface flex items-center gap-2">
                   <span className="material-symbols-outlined text-primary text-lg">tune</span>
@@ -223,7 +253,7 @@ export default function LayananPublikPage() {
           </aside>
 
           {/* SISI KANAN: GRID & LEMBAR DETAIL LAYANAN */}
-          <main className="lg:col-span-8 space-y-6">
+          <main className="lg:col-span-8 space-y-6 order-1 lg:order-2">
             {filteredServices.length === 0 ? (
               /* Pesan Tidak Ditemukan (Empty State) */
               <div className="p-10 bg-surface-container-lowest rounded-2xl shadow-xs border border-surface-container-high/60 text-center space-y-3">
@@ -369,15 +399,6 @@ export default function LayananPublikPage() {
                             <span className="material-symbols-outlined text-base">smart_toy</span>
                             <span>Konsultasikan Persyaratan Ini dengan Virtual Guide</span>
                           </Link>
-                          <a
-                            href={service.downloadUrl || 'https://wa.me/6282177890112'}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 bg-surface-container-highest hover:bg-surface-container text-on-surface px-4 py-2.5 rounded-xl text-xs font-semibold transition-colors"
-                          >
-                            <span className="material-symbols-outlined text-base text-primary">download</span>
-                            <span>{service.downloadUrl ? 'Unduh Blangko Permohonan' : 'Hubungi Loket via WhatsApp'}</span>
-                          </a>
                         </div>
                       </div>
                     )}

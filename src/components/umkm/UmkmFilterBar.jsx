@@ -37,13 +37,13 @@ export default function UmkmFilterBar({
       </div>
 
       {/* Category Filter Pills & Sort Selector */}
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 w-full md:w-auto">
+        <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none w-full">
           {categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => onCategoryChange(cat.id)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
                 selectedCategory === cat.id
                   ? 'bg-primary text-on-primary shadow-xs'
                   : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant'
@@ -61,15 +61,17 @@ export default function UmkmFilterBar({
         </div>
 
         {/* Sort Dropdown */}
-        <select
-          value={sortBy}
-          onChange={(e) => onSortChange(e.target.value)}
-          className="px-3 py-1.5 bg-surface-container-lowest border border-surface-container-high rounded-xl text-xs font-semibold text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
-        >
-          <option value="popular">Terpopuler</option>
-          <option value="az">Nama (A - Z)</option>
-          <option value="newest">Terbaru</option>
-        </select>
+        <div className="flex items-center justify-end shrink-0">
+          <select
+            value={sortBy}
+            onChange={(e) => onSortChange(e.target.value)}
+            className="w-full sm:w-auto px-3 py-1.5 bg-surface-container-lowest border border-surface-container-high rounded-xl text-xs font-semibold text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
+          >
+            <option value="popular">Terpopuler</option>
+            <option value="az">Nama (A - Z)</option>
+            <option value="newest">Terbaru</option>
+          </select>
+        </div>
       </div>
     </div>
   )

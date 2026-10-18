@@ -5,7 +5,7 @@ export default function UmkmCard({ item, onSelectProfile }) {
   return (
     <article className="flex flex-col bg-surface-container-lowest rounded-2xl shadow-xs overflow-hidden hover:shadow-md transition-all border border-surface-container-high/60 group">
       {/* Image Header with Category Badge */}
-      <div className="relative h-56 w-full overflow-hidden bg-surface-container">
+      <div className="relative h-44 sm:h-56 w-full overflow-hidden bg-surface-container">
         <LazyImage
           className="w-full h-full group-hover:scale-105 transition-transform duration-500"
           src={item.image}
@@ -19,16 +19,16 @@ export default function UmkmCard({ item, onSelectProfile }) {
       </div>
 
       {/* Card Body */}
-      <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
+      <div className="p-4 sm:p-6 flex-1 flex flex-col justify-between space-y-3 sm:space-y-4">
         <div className="space-y-2">
-          <h3 className="text-lg font-bold text-on-surface group-hover:text-primary transition-colors line-clamp-1">
+          <h3 className="text-base sm:text-lg font-bold text-on-surface group-hover:text-primary transition-colors line-clamp-1">
             {item.name}
           </h3>
 
           {/* Owner & Phone */}
-          <div className="flex items-center gap-2 text-on-surface-variant text-xs font-medium">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-on-surface-variant text-xs font-medium">
             <span className="material-symbols-outlined text-sm text-primary">person</span>
-            <span>{item.owner}</span>
+            <span className="truncate max-w-[120px] sm:max-w-none">{item.owner}</span>
             <span className="text-outline-variant">•</span>
             <span className="material-symbols-outlined text-sm text-secondary">call</span>
             <span>{item.phone}</span>
