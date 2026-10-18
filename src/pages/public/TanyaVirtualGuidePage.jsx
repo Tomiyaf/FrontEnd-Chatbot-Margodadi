@@ -199,9 +199,19 @@ export default function TanyaVirtualGuidePage() {
     }
   }
 
-  const handleFeedback = (messageId, type) => {
+  const handleFeedback = async (messageId, type) => {
     setFeedbackGiven((prev) => ({ ...prev, [messageId]: type }))
     showToast(type === 'positive' ? 'Terima kasih atas ulasan positif Anda!' : 'Terima kasih atas masukan Anda.')
+    try {
+      await chatbotService.submitFeedback({
+        message_id: messageId,
+        type: type,
+        session_id: sessionId || undefined,
+        conversation_id: conversationId || undefined,
+      })
+    } catch (err) {
+      console.warn('Gagal menyimpan feedback respon AI:', err)
+    }
   }
 
   const handleViewCitation = (sources) => {
@@ -217,8 +227,17 @@ export default function TanyaVirtualGuidePage() {
   }
 
   const handleSubmitFeedbackModal = async (feedbackData) => {
-    await chatbotService.submitFeedback(feedbackData)
-    showToast('Ulasan berhasil dikirim!')
+    try {
+      await chatbotService.submitFeedback({
+        ...feedbackData,
+        conversation_id: conversationId || undefined,
+        session_id: sessionId || undefined,
+      })
+      showToast('Ulasan berhasil dikirim!')
+    } catch (err) {
+      console.error('Submit feedback modal error:', err)
+      showToast('Gagal mengirim ulasan, silakan coba lagi.')
+    }
   }
 
   return (
