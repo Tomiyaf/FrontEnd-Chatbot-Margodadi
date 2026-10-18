@@ -165,16 +165,16 @@ export default function HomePage() {
               {/* Interactive Global Search Bar */}
               <div className="w-full mt-8 md:mt-10 relative" ref={searchContainerRef}>
                 <form
-                  className="relative flex items-center bg-white/95 backdrop-blur-md rounded-2xl shadow-xl shadow-primary/10 p-2 sm:p-2.5 transition-all focus-within:ring-2 focus-within:ring-primary border border-gray-200/80"
+                  className="relative flex items-center bg-white/95 backdrop-blur-md rounded-2xl shadow-xl shadow-primary/10 p-1.5 sm:p-2.5 transition-all focus-within:ring-2 focus-within:ring-primary border border-gray-200/80"
                   onSubmit={handleSearchSubmit}
                 >
-                  <div className="flex items-center pl-3 text-on-surface-variant">
-                    <span className="material-symbols-outlined text-2xl text-primary">search</span>
+                  <div className="flex items-center pl-2 sm:pl-3 text-on-surface-variant shrink-0">
+                    <span className="material-symbols-outlined text-xl sm:text-2xl text-primary">search</span>
                   </div>
                   <input
-                    className="w-full px-3 py-3 text-sm sm:text-base text-on-surface bg-transparent focus:outline-none placeholder:text-outline/70"
+                    className="w-full px-2 sm:px-3 py-2.5 sm:py-3 text-xs sm:text-base text-on-surface bg-transparent focus:outline-none placeholder:text-outline/70 min-w-0"
                     id="global-portal-search"
-                    placeholder="Cari syarat surat, SOP layanan, produk UMKM, atau regulasi pekon..."
+                    placeholder="Cari syarat surat, SOP layanan, produk UMKM..."
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -189,18 +189,18 @@ export default function HomePage() {
                         setSearchQuery('')
                         setShowDropdown(false)
                       }}
-                      className="p-1.5 text-slate-400 hover:text-slate-600 rounded-full transition-colors mr-1 cursor-pointer"
+                      className="p-1 sm:p-1.5 text-slate-400 hover:text-slate-600 rounded-full transition-colors mr-1 cursor-pointer shrink-0"
                       title="Hapus pencarian"
                     >
-                      <span className="material-symbols-outlined text-lg">close</span>
+                      <span className="material-symbols-outlined text-base sm:text-lg">close</span>
                     </button>
                   )}
                   <button
-                    className="shrink-0 bg-primary hover:bg-primary-container text-on-primary px-5 sm:px-6 py-3 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 shadow-md cursor-pointer"
+                    className="shrink-0 bg-primary hover:bg-primary-container text-on-primary px-3 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-1 sm:gap-2 shadow-md cursor-pointer"
                     type="submit"
                   >
-                    <span>Cari</span>
-                    <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                    <span className="hidden xs:inline">Cari</span>
+                    <span className="material-symbols-outlined text-base sm:text-lg">arrow_forward</span>
                   </button>
                 </form>
 
@@ -331,15 +331,15 @@ export default function HomePage() {
                 )}
 
                 {/* Popular Search Chips */}
-                <div className="flex flex-wrap items-center justify-center gap-2 mt-4 text-left">
-                  <span className="text-xs text-on-surface-variant font-semibold flex items-center gap-1 bg-white/80 backdrop-blur-xs px-2.5 py-1 rounded-full border border-gray-200/60">
-                    <span className="material-symbols-outlined text-sm">trending_up</span> Sering Dicari:
+                <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mt-3.5 sm:mt-4 text-left">
+                  <span className="text-[11px] sm:text-xs text-on-surface-variant font-semibold flex items-center gap-1 bg-white/80 backdrop-blur-xs px-2.5 py-1 rounded-full border border-gray-200/60">
+                    <span className="material-symbols-outlined text-xs sm:text-sm">trending_up</span> Sering Dicari:
                   </span>
                   {popularSearches.map((chip, index) => (
                     <button
                       key={index}
                       type="button"
-                      className="text-xs px-3 py-1 rounded-full bg-white/85 hover:bg-white text-on-surface border border-gray-200/70 shadow-2xs transition-all cursor-pointer font-medium"
+                      className="text-[11px] sm:text-xs px-2.5 sm:px-3 py-1 rounded-full bg-white/85 hover:bg-white text-on-surface border border-gray-200/70 shadow-2xs transition-all cursor-pointer font-medium"
                       onClick={() => {
                         setSearchQuery(chip)
                         setShowDropdown(true)
