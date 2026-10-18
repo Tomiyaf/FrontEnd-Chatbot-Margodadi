@@ -36,6 +36,15 @@ export const publicService = {
     const response = await api.get(`/public/umkms/${id}`)
     return response.data
   },
+
+  /**
+   * Get dynamic Pekon WhatsApp Center info from active WAHA session or fallback
+   */
+  async getWhatsAppCenter() {
+    const response = await api.get('/public/whatsapp-center')
+    return response.data
+  },
 }
 
 export default publicService
+
